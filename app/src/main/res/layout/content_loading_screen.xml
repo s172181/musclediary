@@ -26,9 +26,34 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:src="@drawable/loading" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="00dp"
+        tools:layout_editor_absoluteY="0dp"
+        tools:ignore="MissingConstraints">
+
+        <Chronometer
+            android:id="@+id/cmTimer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="@+id/guideline"
+            />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClick"
+            android:text="Start" />
+    </LinearLayout>
+
 
     <Button
-        android:id="@+id/stopRecording"
+        android:id="@+id/btnStop"
         android:layout_width="119dp"
         android:layout_height="wrap_content"
         android:background="@color/colorButton"
@@ -46,6 +71,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/guideline"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5"/>
+        app:layout_constraintGuide_percent="0.85"/>
 
 </android.support.constraint.ConstraintLayout>
