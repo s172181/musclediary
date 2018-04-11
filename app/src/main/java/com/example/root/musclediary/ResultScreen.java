@@ -50,7 +50,8 @@ public class ResultScreen extends AppCompatActivity {
         int it = 0;
         float peakvalue = 0;
         double avg = 0;
-        int Changes=0;
+        int Active=0, Inactive=0, Sum=0;
+        double rate=0;
         SimpleMovingAverage currAvg = new SimpleMovingAverage(100);
 
         //Read from file
@@ -91,14 +92,22 @@ public class ResultScreen extends AppCompatActivity {
 
 
         SimpleMovingAverage TrainingAvgObj = new SimpleMovingAverage(it);
-        SimpleMovingAverage ChangeRate = new SimpleMovingAverage(300);
+        SimpleMovingAverage ChangeRate = new SimpleMovingAverage(1000);
 
 
         for (float i:yvalues) {
             TrainingAvgObj.addData(i);
             ChangeRate.addData(i);
-            if(ChangeRate.getChange() > 0.6) Changes++;
+            if(ChangeRate.getChange() > 0.3 || ChangeRate.getChange() < -0.3) {
+                Active++;
+            }
+            else
+            {
+               Inactive++;
+            }
         }
+        Sum = Active + Inactive;
+        rate= (double)Active*100000/(double)Sum;
 
         //Graph here
         //y the times
@@ -131,7 +140,7 @@ public class ResultScreen extends AppCompatActivity {
         barnum1.setText("Average value: " + TrainingAvgObj.getMean());
 
         TextView barnum2 = (TextView) findViewById(R.id.active);
-        barnum2.setText("Active training: " + Changes);
+        barnum2.setText("Active training in %: " + Math.round(rate));
         //BootstrapProgressBar bar = (BootstrapProgressBar) findViewById(R.id.peekvalue);
         //bar.setProgress(peakvalue);
     }
