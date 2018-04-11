@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -27,6 +30,8 @@ import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.opencsv.CSVReader;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 public class ResultScreen extends AppCompatActivity {
 
@@ -45,7 +50,8 @@ public class ResultScreen extends AppCompatActivity {
         int it = 0;
         float peakvalue = 0;
         double avg = 0;
-        SimpleMovingAverage currAvg = new SimpleMovingAverage(200);
+        int Changes=0;
+        SimpleMovingAverage currAvg = new SimpleMovingAverage(100);
 
         //Read from file
         try {
@@ -53,6 +59,11 @@ public class ResultScreen extends AppCompatActivity {
             InputStreamReader csvStreamReader = new InputStreamReader(in);
             CSVReader reader = new CSVReader(csvStreamReader, '\t');
             String[] nextLine;
+
+          //  while ((nextLine = reader.readNext()) != null) {
+          //      count ++;
+           // }
+
             while ((nextLine = reader.readNext()) != null) {
                 if (it >= startofcsv) {
                     if (it == startofcsv) {
@@ -72,9 +83,21 @@ public class ResultScreen extends AppCompatActivity {
                 }
                 it++;
             }
+
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+
+        SimpleMovingAverage TrainingAvgObj = new SimpleMovingAverage(it);
+        SimpleMovingAverage ChangeRate = new SimpleMovingAverage(300);
+
+
+        for (float i:yvalues) {
+            TrainingAvgObj.addData(i);
+            ChangeRate.addData(i);
+            if(ChangeRate.getChange() > 0.6) Changes++;
         }
 
         //Graph here
@@ -103,6 +126,12 @@ public class ResultScreen extends AppCompatActivity {
         //Progress bar
         TextView barnum = (TextView) findViewById(R.id.peek);
         barnum.setText("Peek value: " + peakvalue);
+
+        TextView barnum1 = (TextView) findViewById(R.id.average);
+        barnum1.setText("Average value: " + TrainingAvgObj.getMean());
+
+        TextView barnum2 = (TextView) findViewById(R.id.active);
+        barnum2.setText("Active training: " + Changes);
         //BootstrapProgressBar bar = (BootstrapProgressBar) findViewById(R.id.peekvalue);
         //bar.setProgress(peakvalue);
     }
@@ -150,10 +179,12 @@ public class ResultScreen extends AppCompatActivity {
         private final Queue<Double> Dataset = new LinkedList<Double>();
         private final int period;
         private double sum;
-
+        double valuechange= 0;
+        int counter=0;
         // constructor to initialize period
         public SimpleMovingAverage(int period) {
             this.period = period;
+            counter = period;
         }
 
         // function to add new data in the
@@ -163,11 +194,14 @@ public class ResultScreen extends AppCompatActivity {
             sum += num;
             Dataset.add(num);
 
+
             // Updating size so that length
             // of data set should be equal
             // to period as a normal mean has
             if (Dataset.size() > period) {
                 sum -= Dataset.remove();
+                if(counter==0) counter = period;
+                counter--;
             }
         }
 
@@ -175,6 +209,21 @@ public class ResultScreen extends AppCompatActivity {
         public double getMean() {
             return sum / period;
         }
+
+        public double getChange() {
+            if(counter==0) {
+                double min = Double.MAX_VALUE;
+                double max = Double.MIN_VALUE;
+                List array = new ArrayList(Dataset);
+                min = (double) Collections.min(array);
+                max = (double) Collections.max(array);
+                valuechange = max - min;
+                return valuechange;
+            }
+            else  return  0;
+        }
+
+
 
     }
 }
