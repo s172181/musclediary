@@ -1,6 +1,7 @@
 package com.example.root.musclediary;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +9,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +32,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 
 import com.beardedhen.androidbootstrap.BootstrapProgressBar;
 import com.jjoe64.graphview.GraphView;
@@ -43,10 +48,21 @@ public class ResultScreen extends AppCompatActivity {
 
     int startofcsv = 4;
 
+    FrameLayout progressBarHolder;
+    ProgressBar progressBarStyleLarge;
+    AlphaAnimation inAnimation;
+    AlphaAnimation outAnimation;
+
+    boolean loadinggraph = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_screen);
+
+        progressBarHolder = (FrameLayout) findViewById(R.id.progressBarHolder);
+        progressBarStyleLarge = (ProgressBar) findViewById(R.id.progressBarimg);
+        new MyTask().execute();
 
         //Wait 2 seconds
         Handler handler = new Handler();
@@ -70,11 +86,11 @@ public class ResultScreen extends AppCompatActivity {
 
                 //Read from file
                 try {
-                    /*final InputStream in = getAssets().open("20180321150413calf.dat");
+                    final InputStream in = getAssets().open("20180321150413calf.dat");
                     InputStreamReader csvStreamReader = new InputStreamReader(in);
-                    CSVReader reader = new CSVReader(csvStreamReader, '\t');*/
+                    CSVReader reader = new CSVReader(csvStreamReader, '\t');
 
-                    String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+                    /*String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
                     String fileName = getIntent().getStringExtra("FILENAME");
 
                     uri=uri + File.separator + fileName;
@@ -82,16 +98,16 @@ public class ResultScreen extends AppCompatActivity {
                     System.out.println("ManualDeb: filename "+uri);
                     FileInputStream fileInputStream = new FileInputStream(file);
                     InputStreamReader csvStreamReader = new InputStreamReader(fileInputStream);
-                    CSVReader reader = new CSVReader(csvStreamReader, ',');
+                    CSVReader reader = new CSVReader(csvStreamReader, ',');*/
                     String[] nextLine;
                     float timestamp = 0;
                     float emg = 0;
                     while ((nextLine = reader.readNext()) != null) {
                         if (it >= startofcsv) {
-                            timestamp = Float.parseFloat(nextLine[0]);
-                            emg = Float.parseFloat(nextLine[2]);
-                            /*timestamp = Float.parseFloat(nextLine[4]);
-                            emg = Float.parseFloat(nextLine[0]);*/
+                            /*timestamp = Float.parseFloat(nextLine[0]);
+                            emg = Float.parseFloat(nextLine[2]);*/
+                            timestamp = Float.parseFloat(nextLine[4]);
+                            emg = Float.parseFloat(nextLine[0]);
                             if (it == startofcsv) {
                                 fvalue = timestamp;
                             }
@@ -118,6 +134,7 @@ public class ResultScreen extends AppCompatActivity {
                         it++;
                     }
                 } catch (Exception e) {
+                    loadinggraph = false;
                     e.printStackTrace();
                     System.out.println("ManualDeb: filename error "+e.getMessage());
                     Toast.makeText(ResultScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -185,6 +202,7 @@ public class ResultScreen extends AppCompatActivity {
 
                 TextView barnum2 = (TextView) findViewById(R.id.active);
                 barnum2.setText("Active training in %: " + Math.round(rate));
+                loadinggraph = false;
                 //BootstrapProgressBar bar = (BootstrapProgressBar) findViewById(R.id.peekvalue);
                 //bar.setProgress(peakvalue);
             }
@@ -197,6 +215,42 @@ public class ResultScreen extends AppCompatActivity {
         finish();
         Intent intent = new Intent(ResultScreen.this, ListMuscles.class);
         startActivity(intent);
+    }
+
+    private class MyTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            inAnimation = new AlphaAnimation(0f, 1f);
+            inAnimation.setDuration(200);
+            progressBarHolder.setAnimation(inAnimation);
+            progressBarHolder.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            outAnimation = new AlphaAnimation(1f, 0f);
+            outAnimation.setDuration(200);
+            progressBarHolder.setAnimation(outAnimation);
+            progressBarHolder.setAlpha(1);
+            progressBarHolder.setBackgroundColor(0xFFFFFFFF);
+            progressBarStyleLarge.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                while (loadinggraph) {
+                    //System.out.println("ManualDeb: Emulating some task.. Step ");
+                    TimeUnit.SECONDS.sleep(1);
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 
     private void simplifyGraph(CSVReader reader) throws IOException {
