@@ -8,13 +8,6 @@
     tools:context="com.example.root.musclediary.MyHistory"
     tools:showIn="@layout/activity_my_history">
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:scaleType="fitXY"
-        android:src="@drawable/menudesign3" />
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

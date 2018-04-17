@@ -8,29 +8,23 @@
     tools:context="com.example.root.musclediary.LoadingScreen"
     tools:showIn="@layout/activity_loading_screen">
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:scaleType="fitXY"
-        android:src="@drawable/menudesign3" />
-
-    <ImageView
-        android:layout_width="0dp"
+    <Chronometer
+        android:id="@+id/cmTimer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:textSize="60sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:src="@drawable/loading" />
-
+        app:layout_constraintRight_toRightOf="parent"
+       app:layout_constraintVertical_bias="0.0" />
 
     <Button
         android:id="@+id/stopRecording"
         android:layout_width="119dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:background="@color/colorButton"
         app:layout_constraintTop_toTopOf="@+id/guideline"
         android:layout_marginTop="8dp"

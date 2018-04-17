@@ -8,13 +8,6 @@
     tools:context="com.example.root.musclediary.ListMuscles"
     tools:showIn="@layout/app_bar_listmuscles">
 
-    <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:scaleType="fitXY"
-        android:src="@drawable/menudesign3" />
-
     <Spinner
         android:id="@+id/spinner1"
         android:layout_width="match_parent"

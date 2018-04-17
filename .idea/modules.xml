@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MuscleDiary.iml" filepath="$PROJECT_DIR$/MuscleDiary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/subProject/ShimmerAndroidInstrumentDriver/ShimmerAndroidInstrumentDriver.iml" filepath="$PROJECT_DIR$/subProject/ShimmerAndroidInstrumentDriver/ShimmerAndroidInstrumentDriver.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/subProject/subProject.iml" filepath="$PROJECT_DIR$/subProject/subProject.iml" />
     </modules>
   </component>
 </project>

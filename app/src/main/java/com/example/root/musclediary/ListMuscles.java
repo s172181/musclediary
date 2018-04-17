@@ -16,20 +16,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Activity;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.widget.ArrayAdapter;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class ListMuscles extends AppCompatActivity {
+
+    private String macAdd = "";
 
     private DrawerLayout mDrawer;
     private ActionBarDrawerToggle drawerToggle;
     private Toolbar toolbar;
     private NavigationView nvDrawer;
     public TextView textConnect;
-
+    MyGlobals aux = new MyGlobals();
+    private String filename = "";
+    Timer timer = new Timer();
+    Button connectSensor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +46,12 @@ public class ListMuscles extends AppCompatActivity {
         setContentView(R.layout.activity_list_muscles);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+
+
+
+        Intent i = getIntent();
+        aux = (MyGlobals) i.getSerializableExtra("primObject");
 
         //Spinner
         //get the spinner from the xml.
@@ -54,18 +69,49 @@ public class ListMuscles extends AppCompatActivity {
         nvDrawer = (NavigationView) findViewById(R.id.nav_view);
         setupDrawerContent(nvDrawer);
 
-        final Button connectSensor = (Button) findViewById(R.id.startRecord);
+        macAdd = getIntent().getStringExtra("ITEM_EXTRA");
+        filename = getIntent().getStringExtra("FILENAME");
+
+        connectSensor = (Button) findViewById(R.id.startRecord);
+        connectSensor.setEnabled(false);
+        connectSensor.setBackgroundColor(0xFFFF0000);
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Here we do the connection and the go to listmuscles
+
                 Intent intent = new Intent(ListMuscles.this, LoadingScreen.class);
+                intent.putExtra("primObject", aux);
+                intent.putExtra("FILENAME", filename);
+
                 ListMuscles.this.startActivity(intent);
             }
         });
 
-        //textConnect = (TextView) findViewById(R.id.sensorCon);
-        //textConnect.setText("HOLAAAA");
+        //Activate when state of shimmer is Login
+        //Set the schedule function
+        timer.scheduleAtFixedRate(new TimerTask() {
+              @Override
+              public void run() {
+                  // use runOnUiThread(Runnable action)
+                  runOnUiThread(new Runnable() {
+                      @Override
+                      public void run() {
+                          // Magic here
+                          //connectSensor.setEnabled(true);
+                          if (aux!=null) {
+                              if (aux.getStateShimmer().equals("SD Logging")) {
+                                  connectSensor.setEnabled(true);
+                                  connectSensor.setBackgroundColor(getResources().getColor(R.color.colorButton));
+                                  timer.cancel();
+                              }
+                          }
+                      }
+                  });
+
+                  }
+              },
+        0, 500);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -123,6 +169,11 @@ public class ListMuscles extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
+        timer.cancel();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
+        this.finish();
     }
 
     @Override
