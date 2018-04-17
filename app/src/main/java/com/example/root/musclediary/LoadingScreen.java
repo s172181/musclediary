@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Chronometer;
+
 import android.widget.Toast;
 
 import com.shimmerresearch.android.Shimmer;
@@ -35,6 +36,7 @@ import java.util.Date;
 
 import static com.shimmerresearch.android.guiUtilities.ShimmerBluetoothDialog.EXTRA_DEVICE_ADDRESS;
 import com.example.root.musclediary.MyGlobals;
+
 
 public class LoadingScreen extends AppCompatActivity {
 
@@ -94,5 +96,4 @@ public class LoadingScreen extends AppCompatActivity {
             }
         });
     }
-
 }

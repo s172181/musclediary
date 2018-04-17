@@ -19,7 +19,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
 import java.util.ArrayList;
+
 import java.util.Date;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -32,6 +37,8 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.opencsv.CSVReader;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class ResultScreen extends AppCompatActivity {
 
     int startofcsv = 4;
@@ -40,7 +47,6 @@ public class ResultScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_screen);
-
 
         //Wait 2 seconds
         Handler handler = new Handler();
@@ -57,8 +63,10 @@ public class ResultScreen extends AppCompatActivity {
                 float newv = 0;
                 int it = 0;
                 float peakvalue = 0;
+                int Active=0, Inactive=0, Sum=0;
+                double rate=0;
                 double avg = 0;
-                SimpleMovingAverage currAvg = new SimpleMovingAverage(200);
+                SimpleMovingAverage currAvg = new SimpleMovingAverage(100);
 
                 //Read from file
                 try {
@@ -114,6 +122,24 @@ public class ResultScreen extends AppCompatActivity {
                     System.out.println("ManualDeb: filename error "+e.getMessage());
                     Toast.makeText(ResultScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+                
+                SimpleMovingAverage TrainingAvgObj = new SimpleMovingAverage(it);
+                SimpleMovingAverage ChangeRate = new SimpleMovingAverage(1000);
+
+
+                for (float i:yvalues) {
+                    TrainingAvgObj.addData(i);
+                    ChangeRate.addData(i);
+                    if(ChangeRate.getChange() > 0.3 || ChangeRate.getChange() < -0.3) {
+                        Active++;
+                    }
+                    else
+                    {
+                    Inactive++;
+                    }
+                }
+                Sum = Active + Inactive;
+                rate= (double)Active*100000/(double)Sum;
 
                 //Graph here
                 //y the times
@@ -122,6 +148,7 @@ public class ResultScreen extends AppCompatActivity {
                 for (int i = 0; i < xvalues.size(); i++) {
                     // add new DataPoint object to the array for each of your list entries
                     dataPoints[i] = new DataPoint(xvaluesS.get(i), yvalues.get(i)); // not sure but I think the second argument should be of type double
+                    
                 }
 
                 GraphView graphview = (GraphView) findViewById(R.id.graph);
@@ -152,12 +179,16 @@ public class ResultScreen extends AppCompatActivity {
                 //Progress bar
                 TextView barnum = (TextView) findViewById(R.id.peek);
                 barnum.setText("Peek value: " + peakvalue);
+
+                TextView barnum1 = (TextView) findViewById(R.id.average);
+                barnum1.setText("Average value: " + TrainingAvgObj.getMean());
+
+                TextView barnum2 = (TextView) findViewById(R.id.active);
+                barnum2.setText("Active training in %: " + Math.round(rate));
                 //BootstrapProgressBar bar = (BootstrapProgressBar) findViewById(R.id.peekvalue);
                 //bar.setProgress(peakvalue);
             }
-        }, 1000);   //2 seconds
-
-
+            }, 1000);   //2 seconds
     }
 
     @Override
@@ -203,10 +234,12 @@ public class ResultScreen extends AppCompatActivity {
         private final Queue<Double> Dataset = new LinkedList<Double>();
         private final int period;
         private double sum;
-
+        double valuechange= 0;
+        int counter=0;
         // constructor to initialize period
         public SimpleMovingAverage(int period) {
             this.period = period;
+            counter = period;
         }
 
         // function to add new data in the
@@ -216,11 +249,14 @@ public class ResultScreen extends AppCompatActivity {
             sum += num;
             Dataset.add(num);
 
+
             // Updating size so that length
             // of data set should be equal
             // to period as a normal mean has
             if (Dataset.size() > period) {
                 sum -= Dataset.remove();
+                if(counter==0) counter = period;
+                counter--;
             }
         }
 
@@ -228,6 +264,21 @@ public class ResultScreen extends AppCompatActivity {
         public double getMean() {
             return sum / period;
         }
+
+        public double getChange() {
+            if(counter==0) {
+                double min = Double.MAX_VALUE;
+                double max = Double.MIN_VALUE;
+                List array = new ArrayList(Dataset);
+                min = (double) Collections.min(array);
+                max = (double) Collections.max(array);
+                valuechange = max - min;
+                return valuechange;
+            }
+            else  return  0;
+        }
+
+
 
     }
 }

@@ -1,0 +1,3 @@
+# Referenced at /home/alejuliet/AndroidStudioProjects/MuscleDiary/subProject/ShimmerAndroidInstrumentDriver/build/intermediates/manifest/androidTest/debug/AndroidManifest.xml:9
+-keep class com.android.test.runner.MultiDexTestRunner { <init>(...); }
+
