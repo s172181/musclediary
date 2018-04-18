@@ -86,11 +86,11 @@ public class ResultScreen extends AppCompatActivity {
 
                 //Read from file
                 try {
-                    final InputStream in = getAssets().open("20180321150413calf.dat");
+                    /*final InputStream in = getAssets().open("20180321150413calf.dat");
                     InputStreamReader csvStreamReader = new InputStreamReader(in);
-                    CSVReader reader = new CSVReader(csvStreamReader, '\t');
+                    CSVReader reader = new CSVReader(csvStreamReader, '\t');*/
 
-                    /*String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+                    String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
                     String fileName = getIntent().getStringExtra("FILENAME");
 
                     uri=uri + File.separator + fileName;
@@ -98,16 +98,16 @@ public class ResultScreen extends AppCompatActivity {
                     System.out.println("ManualDeb: filename "+uri);
                     FileInputStream fileInputStream = new FileInputStream(file);
                     InputStreamReader csvStreamReader = new InputStreamReader(fileInputStream);
-                    CSVReader reader = new CSVReader(csvStreamReader, ',');*/
+                    CSVReader reader = new CSVReader(csvStreamReader, ',');
                     String[] nextLine;
                     float timestamp = 0;
                     float emg = 0;
                     while ((nextLine = reader.readNext()) != null) {
                         if (it >= startofcsv) {
-                            /*timestamp = Float.parseFloat(nextLine[0]);
-                            emg = Float.parseFloat(nextLine[2]);*/
-                            timestamp = Float.parseFloat(nextLine[4]);
-                            emg = Float.parseFloat(nextLine[0]);
+                            timestamp = Float.parseFloat(nextLine[0]);
+                            emg = Float.parseFloat(nextLine[2]);
+                            /*timestamp = Float.parseFloat(nextLine[4]);
+                            emg = Float.parseFloat(nextLine[0]);*/
                             if (it == startofcsv) {
                                 fvalue = timestamp;
                             }
