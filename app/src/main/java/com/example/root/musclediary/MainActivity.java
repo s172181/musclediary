@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        aux.setBTHandler(this,mHandler);
+        /*Commented wed*/
+        /*aux.setBTHandler(this,mHandler);*/
 
         //Check if permission to write to external storage has been granted
         //This is to write the csv file into the external storage
@@ -89,7 +90,10 @@ public class MainActivity extends AppCompatActivity {
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startbluet();
+                /*Commented wed*/
+                /*startbluet();*/
+                Intent intent = new Intent(MainActivity.this, ListMuscles.class);
+                MainActivity.this.startActivity(intent);
             }
         });
 
@@ -107,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Setup CSV writing
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+        /*Commented wed*/
+        /*String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
         fileName = "EMGData" + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
         String filePath = baseDir + File.separator + fileName;
         file = new File(filePath);
@@ -119,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
             bw = new BufferedWriter(fw);
         } catch(IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     /**
@@ -130,7 +135,9 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 2) {
+
+        /*Commented wed*/
+        /*if(requestCode == 2) {
             if (resultCode == Activity.RESULT_OK) {
                 //Get the Bluetooth mac address of the selected device:
                 String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
@@ -144,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
             else
                 Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
 
-        }
+        }*/
         super.onActivityResult(requestCode, resultCode, data);
     }
 

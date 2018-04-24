@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.example.root.musclediary"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         multiDexEnabled true
         versionCode 1
@@ -39,5 +39,6 @@ dependencies {
     compile 'com.beardedhen:androidbootstrap:2.3.1'
     compile 'com.opencsv:opencsv:3.9'
     compile 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
     compile project(':subProject:ShimmerAndroidInstrumentDriver')
 }

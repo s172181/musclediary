@@ -5,4 +5,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#ffffff</color>
+    <color name="cs_textcolor">#363636</color>
+    <color name="weekNumberColor">#350074</color>
+    <color name="floatb">#cbcbcb</color>
+
 </resources>

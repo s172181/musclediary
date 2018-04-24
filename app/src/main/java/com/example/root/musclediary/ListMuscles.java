@@ -1,6 +1,8 @@
 package com.example.root.musclediary;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -47,16 +49,18 @@ public class ListMuscles extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("List Muscles");
 
         Intent i = getIntent();
-        aux = (MyGlobals) i.getSerializableExtra("primObject");
+        /*Commented wed*/
+        /*aux = (MyGlobals) i.getSerializableExtra("primObject");*/
 
         //Spinner
         //get the spinner from the xml.
         Spinner dropdown = findViewById(R.id.spinner1);
-        String[] items = new String[]{"Bicepts", "Muscle2"};
+        String[] items = new String[]{"Upper Leg", "Low Leg", "Biceps","Triceps" };
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
 
@@ -73,24 +77,45 @@ public class ListMuscles extends AppCompatActivity {
         filename = getIntent().getStringExtra("FILENAME");
 
         connectSensor = (Button) findViewById(R.id.startRecord);
-        connectSensor.setEnabled(false);
-        connectSensor.setBackgroundColor(0xFFFF0000);
+        /*Commented wed*/
+        /*connectSensor.setEnabled(false);
+        connectSensor.setBackgroundColor(0xFFFF0000);*/
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Here we do the connection and the go to listmuscles
 
                 Intent intent = new Intent(ListMuscles.this, LoadingScreen.class);
-                intent.putExtra("primObject", aux);
-                intent.putExtra("FILENAME", filename);
+                /*Commented wed*/
+                /*intent.putExtra("primObject", aux);
+                intent.putExtra("FILENAME", filename);*/
 
                 ListMuscles.this.startActivity(intent);
             }
         });
 
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ListMuscles.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(ListMuscles.this);
+                }
+                builder.setTitle("Shimmer Sensor")
+                        .setMessage("To connect the sensor ... ")
+                        .setPositiveButton("OK",null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
         //Activate when state of shimmer is Login
         //Set the schedule function
-        timer.scheduleAtFixedRate(new TimerTask() {
+        /*Commented wed*/
+        /*timer.scheduleAtFixedRate(new TimerTask() {
               @Override
               public void run() {
                   // use runOnUiThread(Runnable action)
@@ -111,7 +136,7 @@ public class ListMuscles extends AppCompatActivity {
 
                   }
               },
-        0, 500);
+        0, 500);*/
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -125,22 +150,25 @@ public class ListMuscles extends AppCompatActivity {
                 });
     }
 
+    /*
+    *MiHistory
+     */
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.nav_hist:
-                fragmentClass = HistoryFragment.class;
+                fragmentClass = MyHistory.class;
                 break;
             case R.id.nav_exer:
-                fragmentClass = HistoryFragment.class;
+                fragmentClass = MyHistory.class;
                 break;
             case R.id.nav_feed:
-                fragmentClass = HistoryFragment.class;
+                fragmentClass = MyHistory.class;
                 break;
             default:
-                fragmentClass = HistoryFragment.class;
+                fragmentClass = MyHistory.class;
         }
 
         try {
@@ -150,8 +178,8 @@ public class ListMuscles extends AppCompatActivity {
         }
 
         // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        Intent intent = new Intent(ListMuscles.this, fragmentClass);
+        ListMuscles.this.startActivity(intent);
 
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);

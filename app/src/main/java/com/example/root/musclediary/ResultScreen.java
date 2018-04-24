@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import java.util.Date;
@@ -35,6 +37,11 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import com.beardedhen.androidbootstrap.BootstrapProgressBar;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -46,6 +53,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 public class ResultScreen extends AppCompatActivity {
 
+    //Start of the file, normally the file from shimmercapture starts with data at the 4 row
     int startofcsv = 4;
 
     FrameLayout progressBarHolder;
@@ -59,6 +67,10 @@ public class ResultScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_screen);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Result Screen");
 
         progressBarHolder = (FrameLayout) findViewById(R.id.progressBarHolder);
         progressBarStyleLarge = (ProgressBar) findViewById(R.id.progressBarimg);
@@ -82,15 +94,20 @@ public class ResultScreen extends AppCompatActivity {
                 int Active=0, Inactive=0, Sum=0;
                 double rate=0;
                 double avg = 0;
+                long minutes = 0;
                 SimpleMovingAverage currAvg = new SimpleMovingAverage(100);
 
                 //Read from file
                 try {
-                    /*final InputStream in = getAssets().open("20180321150413calf.dat");
+                    //Here we read from the file
+                    //Change name of the file here
+                    final InputStream in = getAssets().open("20180321150413calf.dat");
+                    //final InputStream in = getAssets().open("EMGDataApr 18, 2018 6_38_50 PM.csv");
                     InputStreamReader csvStreamReader = new InputStreamReader(in);
-                    CSVReader reader = new CSVReader(csvStreamReader, '\t');*/
+                    CSVReader reader = new CSVReader(csvStreamReader, '\t');
+                    //CSVReader reader = new CSVReader(csvStreamReader, ',');
 
-                    String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+                    /*String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
                     String fileName = getIntent().getStringExtra("FILENAME");
 
                     uri=uri + File.separator + fileName;
@@ -98,22 +115,25 @@ public class ResultScreen extends AppCompatActivity {
                     System.out.println("ManualDeb: filename "+uri);
                     FileInputStream fileInputStream = new FileInputStream(file);
                     InputStreamReader csvStreamReader = new InputStreamReader(fileInputStream);
-                    CSVReader reader = new CSVReader(csvStreamReader, ',');
+                    CSVReader reader = new CSVReader(csvStreamReader, ',');*/
                     String[] nextLine;
                     float timestamp = 0;
                     float emg = 0;
+                    float seconds = 0;
                     while ((nextLine = reader.readNext()) != null) {
                         if (it >= startofcsv) {
-                            timestamp = Float.parseFloat(nextLine[0]);
-                            emg = Float.parseFloat(nextLine[2]);
-                            /*timestamp = Float.parseFloat(nextLine[4]);
-                            emg = Float.parseFloat(nextLine[0]);*/
+                            /*timestamp = Float.parseFloat(nextLine[0]);
+                            emg = Float.parseFloat(nextLine[2]);*/ //Depends of channel?
+                            //Here is the columns were we read from the file
+                            //since we are using channel one then we need to select column
+                            //column 6 (EMG_CH1_24BIT_CAL)
+                            //column 5 Timestamp CAL
+                            timestamp = Float.parseFloat(nextLine[4]);
+                            emg = Float.parseFloat(nextLine[0]);
+
                             if (it == startofcsv) {
                                 fvalue = timestamp;
                             }
-                            //Getting max value
-                            if (emg > peakvalue)
-                                peakvalue = emg;
                             if (timestamp>previousminutes)
                                 newv = timestamp - fvalue;
                             else {
@@ -121,14 +141,15 @@ public class ResultScreen extends AppCompatActivity {
                                 continue;
                             }
                             previousminutes = newv;
+                            //Getting max value
+                            if (emg > peakvalue)
+                                peakvalue = emg;
 
                             xvalues.add(newv);
-                            xvaluesS.add(newv/60000); //time in minutes
-                            totalminutes = newv/60000; //time in minutes
                             currAvg.addData(emg);
                             avg = currAvg.getMean();
                             yvalues.add((float) avg);
-                    /*if (it == 500000)
+                   /* if (it == 100)
                         break;*/
                         }
                         it++;
@@ -139,7 +160,7 @@ public class ResultScreen extends AppCompatActivity {
                     System.out.println("ManualDeb: filename error "+e.getMessage());
                     Toast.makeText(ResultScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-                
+
                 SimpleMovingAverage TrainingAvgObj = new SimpleMovingAverage(it);
                 SimpleMovingAverage ChangeRate = new SimpleMovingAverage(1000);
 
@@ -162,11 +183,19 @@ public class ResultScreen extends AppCompatActivity {
                 //y the times
                 //x the averages
                 DataPoint[] dataPoints = new DataPoint[xvalues.size()]; // declare an array of DataPoint objects with the same size as your list
+                List<Entry> entries = new ArrayList<Entry>();
                 for (int i = 0; i < xvalues.size(); i++) {
+                    //System.out.println("ManualDeb: x y"+xvaluesS.get(i)+" "+yvalues.get(i));
                     // add new DataPoint object to the array for each of your list entries
-                    dataPoints[i] = new DataPoint(xvaluesS.get(i), yvalues.get(i)); // not sure but I think the second argument should be of type double
-                    
+                    dataPoints[i] = new DataPoint(xvalues.get(i), yvalues.get(i)); // not sure but I think the second argument should be of type double
+                    entries.add(new Entry(xvalues.get(i), yvalues.get(i)));
                 }
+
+                /*LineChart chart = (LineChart) findViewById(R.id.graph);
+                LineDataSet dataSet = new LineDataSet(entries, "Label");
+                LineData lineData = new LineData(dataSet);
+                chart.setData(lineData);
+                chart.invalidate();*/ // refresh
 
                 GraphView graphview = (GraphView) findViewById(R.id.graph);
                 LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
@@ -176,13 +205,32 @@ public class ResultScreen extends AppCompatActivity {
                 graphview.getViewport().setScalable(true);
 
                 // activate horizontal scrolling
+                NumberFormat nf = NumberFormat.getInstance();
+
+                // custom label formatter to show currency "EUR"
+                graphview.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+                    @Override
+                    public String formatLabel(double value, boolean isValueX) {
+                        if (isValueX) {
+                            // show x values in minutes
+                            String val3 = String.format(".%d", TimeUnit.MILLISECONDS.toSeconds((long) value) -
+                                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) value))
+                            );
+                            return super.formatLabel(TimeUnit.MILLISECONDS.toMinutes((long) value), isValueX)+val3;
+                        } else {
+                            // show currency for y values
+                            return super.formatLabel(value, isValueX);
+                        }
+                    }
+                });
+
                 graphview.getViewport().setScrollable(true);
 
                 // set manual X bounds
-                graphview.getViewport().setXAxisBoundsManual(true);
-                graphview.getViewport().setMinX(0);
+                //graphview.getViewport().setXAxisBoundsManual(true);
+                //graphview.getViewport().setMinX(0);
 
-                int totalminutes2 = 3;
+               /* int totalminutes2 = 3;
                 if (totalminutes>10)
                     totalminutes2 = Math.round(totalminutes/2);
                 else if (totalminutes>1)
@@ -190,8 +238,8 @@ public class ResultScreen extends AppCompatActivity {
                 else if (totalminutes<=1)
                     totalminutes2 = Math.round(1);
 
-                System.out.println("ManualDeb: Total minutes: "+totalminutes2);
-                graphview.getViewport().setMaxX(totalminutes2+0.5);
+                System.out.println("ManualDeb: Total minutes: "+totalminutes+" "+totalminutes2);
+                graphview.getViewport().setMaxX(totalminutes2+0.5);*/
 
                 //Progress bar
                 TextView barnum = (TextView) findViewById(R.id.peek);
@@ -233,6 +281,8 @@ public class ResultScreen extends AppCompatActivity {
             super.onPostExecute(aVoid);
             outAnimation = new AlphaAnimation(1f, 0f);
             outAnimation.setDuration(200);
+            LinearLayout progressBarsvalue = (LinearLayout) findViewById(R.id.progressBarsvalue);
+            progressBarsvalue.setVisibility(View.VISIBLE);
             progressBarHolder.setAnimation(outAnimation);
             progressBarHolder.setAlpha(1);
             progressBarHolder.setBackgroundColor(0xFFFFFFFF);
@@ -253,6 +303,9 @@ public class ResultScreen extends AppCompatActivity {
         }
     }
 
+    /*
+    Not used
+     */
     private void simplifyGraph(CSVReader reader) throws IOException {
         List<Float> xvalues = new ArrayList<Float>();
         List<Float> yvalues = new ArrayList<Float>();

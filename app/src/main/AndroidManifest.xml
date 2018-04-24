@@ -11,6 +11,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,18 +22,22 @@
         </activity>
         <activity
             android:name=".ListMuscles"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_list_muscles"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MyHistory"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_my_history"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/SuperCoolAppBarActivity" />
         <activity
             android:name=".ResultScreen"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_result_screen"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoadingScreen"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_loading_screen"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
