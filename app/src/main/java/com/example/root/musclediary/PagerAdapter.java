@@ -25,7 +25,7 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
                 TabFragment3 tab3 = new TabFragment3();
                 return tab3;
             default:
-                TabFragment1 tab4 = new TabFragment1();
+                TabFragment3 tab4 = new TabFragment3();
                 return tab4;
         }
     }

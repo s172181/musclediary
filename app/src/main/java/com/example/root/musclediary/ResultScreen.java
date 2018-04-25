@@ -54,7 +54,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public class ResultScreen extends AppCompatActivity {
 
     //Start of the file, normally the file from shimmercapture starts with data at the 4 row
-    int startofcsv = 4;
+    int startofcsv = 2;
 
     FrameLayout progressBarHolder;
     ProgressBar progressBarStyleLarge;
@@ -68,6 +68,12 @@ public class ResultScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_result_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        //Create database
+        // Get singleton instance of database
+        /*DBHelper databaseHelper = DBHelper.getInstance(this);
+        databaseHelper.insertContent("0.5",0.6,0.7);
+        databaseHelper.getAllPosts();*/
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Result Screen");
@@ -96,18 +102,19 @@ public class ResultScreen extends AppCompatActivity {
                 double avg = 0;
                 long minutes = 0;
                 SimpleMovingAverage currAvg = new SimpleMovingAverage(100);
+                //SimpleMovingAverage currAvg = new SimpleMovingAverage(1);
 
                 //Read from file
                 try {
                     //Here we read from the file
                     //Change name of the file here
-                    final InputStream in = getAssets().open("20180321150413calf.dat");
+                    /*final InputStream in = getAssets().open("EMGDataApr 25, 2018 11_24_21 AM.csv");
                     //final InputStream in = getAssets().open("EMGDataApr 18, 2018 6_38_50 PM.csv");
                     InputStreamReader csvStreamReader = new InputStreamReader(in);
-                    CSVReader reader = new CSVReader(csvStreamReader, '\t');
-                    //CSVReader reader = new CSVReader(csvStreamReader, ',');
+                    //CSVReader reader = new CSVReader(csvStreamReader, '\t');
+                    CSVReader reader = new CSVReader(csvStreamReader, ',');*/
 
-                    /*String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+                    String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
                     String fileName = getIntent().getStringExtra("FILENAME");
 
                     uri=uri + File.separator + fileName;
@@ -115,21 +122,21 @@ public class ResultScreen extends AppCompatActivity {
                     System.out.println("ManualDeb: filename "+uri);
                     FileInputStream fileInputStream = new FileInputStream(file);
                     InputStreamReader csvStreamReader = new InputStreamReader(fileInputStream);
-                    CSVReader reader = new CSVReader(csvStreamReader, ',');*/
+                    CSVReader reader = new CSVReader(csvStreamReader, ',');
                     String[] nextLine;
                     float timestamp = 0;
                     float emg = 0;
                     float seconds = 0;
                     while ((nextLine = reader.readNext()) != null) {
                         if (it >= startofcsv) {
-                            /*timestamp = Float.parseFloat(nextLine[0]);
-                            emg = Float.parseFloat(nextLine[2]);*/ //Depends of channel?
+                            timestamp = Float.parseFloat(nextLine[0]);
+                            emg = Float.parseFloat(nextLine[2]); //Channel 1
                             //Here is the columns were we read from the file
                             //since we are using channel one then we need to select column
                             //column 6 (EMG_CH1_24BIT_CAL)
                             //column 5 Timestamp CAL
-                            timestamp = Float.parseFloat(nextLine[4]);
-                            emg = Float.parseFloat(nextLine[0]);
+                            /*timestamp = Float.parseFloat(nextLine[5]);
+                            emg = Float.parseFloat(nextLine[6]);*/
 
                             if (it == startofcsv) {
                                 fvalue = timestamp;
@@ -165,15 +172,18 @@ public class ResultScreen extends AppCompatActivity {
                 SimpleMovingAverage ChangeRate = new SimpleMovingAverage(1000);
 
 
+                ArrayList<Double> peaks = new ArrayList<Double>();
+
                 for (float i:yvalues) {
                     TrainingAvgObj.addData(i);
                     ChangeRate.addData(i);
+                    peaks.add(ChangeRate.getChange());
                     if(ChangeRate.getChange() > 0.3 || ChangeRate.getChange() < -0.3) {
                         Active++;
                     }
                     else
                     {
-                    Inactive++;
+                        Inactive++;
                     }
                 }
                 Sum = Active + Inactive;
@@ -243,7 +253,7 @@ public class ResultScreen extends AppCompatActivity {
 
                 //Progress bar
                 TextView barnum = (TextView) findViewById(R.id.peek);
-                barnum.setText("Peek value: " + peakvalue);
+                barnum.setText("Peek value: " + Collections.max(peaks));
 
                 TextView barnum1 = (TextView) findViewById(R.id.average);
                 barnum1.setText("Average value: " + TrainingAvgObj.getMean());

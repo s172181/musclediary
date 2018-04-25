@@ -951,6 +951,7 @@ public class ShimmerBluetoothManagerAndroid extends ShimmerBluetoothManager {
                 if (setting==0){
                     stemp.enableDefaultECGConfiguration();
                 } else if (setting==1){
+                    System.out.println("ManualDeb: PASO AQUI");
                     stemp.enableDefaultEMGConfiguration();
                 } else if (setting==2){
                     stemp.enableEXGTestSignal();

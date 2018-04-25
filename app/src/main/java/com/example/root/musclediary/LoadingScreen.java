@@ -79,8 +79,8 @@ public class LoadingScreen extends AppCompatActivity {
         //Start BTshimmer
         Intent i = getIntent();
         /*Commented wed*/
-        /*aux2 = (MyGlobals) i.getSerializableExtra("primObject");
-        filename = getIntent().getStringExtra("FILENAME");*/
+        aux2 = (MyGlobals) i.getSerializableExtra("primObject");
+        filename = getIntent().getStringExtra("FILENAME");
         aux2.startBT();
 
         //Stop recording
@@ -92,11 +92,11 @@ public class LoadingScreen extends AppCompatActivity {
                 cmTimer.stop();
                 cmTimer.setText("");
                 /*Commented wed*/
-                /*aux2.stopBT();*/
+                aux2.stopBT();
 
                 //Go to resultscreen
                 Intent intent = new Intent(LoadingScreen.this, ResultScreen.class);
-                /*intent.putExtra("FILENAME", filename);*/
+                intent.putExtra("FILENAME", filename);
                 LoadingScreen.this.startActivity(intent);
             }
         });

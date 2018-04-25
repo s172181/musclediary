@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,86 +16,126 @@ import java.util.HashMap;
  */
 
 public class DBHelper extends SQLiteOpenHelper {
+    private static DBHelper sInstance;
 
-    public static final String DATABASE_NAME = "musclediary.db";
-    public static final String DATA_AUX = "dataaux";
-    public static final String stringInfo = "linestring";
-    private HashMap hp;
+    // Database Info
+    private static final String DATABASE_NAME = "musclediary.db";
+    private static final int DATABASE_VERSION = 1;
 
-    public DBHelper(Context context) {
-        super(context, DATABASE_NAME , null, 1);
+    // Table Names
+    private static final String TABLE_TRAINING = "training";
+
+    // training Table Columns
+    private static final String KEY_TRA_ID = "idtraining";
+    private static final String KEY_TRA_DATE = "datetr";
+    private static final String KEY_TRA_AT = "activetraining";
+    private static final String KEY_TRA_PV = "peekvalue";
+    private static final String KEY_TRA_AV = "averagevalue";
+
+    public static synchronized DBHelper getInstance(Context context) {
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+            sInstance = new DBHelper(context.getApplicationContext());
+        }
+        return sInstance;
     }
 
+    public DBHelper(Context context) {
+        super(context, DATABASE_NAME , null, DATABASE_VERSION);
+    }
+
+    // Called when the database connection is being configured.
+    // Configure database settings for things like foreign key support, write-ahead logging, etc.
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
+    }
+
+    // Called when the database is created for the FIRST time.
+    // If a database already exists on disk with the same DATABASE_NAME, this method will NOT be called.
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // TODO Auto-generated method stub
-        db.execSQL("DROP TABLE IF EXISTS dataaux");
-        db.execSQL(
-                "create table dataaux " +
-                        "(id integer primary key, stringInfo text)"
-        );
+        try {
+            String CREATE_TRA_TABLE = "CREATE TABLE " + TABLE_TRAINING +
+                    "(" +
+                    KEY_TRA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Define a primary key
+                    KEY_TRA_DATE + " datetime default current_timestamp," + // Define a primary key
+                    KEY_TRA_AT + " REAL ," + // Define a foreign key
+                    KEY_TRA_PV + " REAL ," + // Define a foreign key
+                    KEY_TRA_AV + " REAL" +
+                    ")";
+            db.execSQL(CREATE_TRA_TABLE);
+            System.out.println("ManualDeb: created table");
+        } catch (Exception e) {
+            System.out.println("ManualDeb: Error while creating table "+e.getMessage());
+        }
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // TODO Auto-generated method stub
-        db.execSQL("DROP TABLE IF EXISTS dataaux");
+        db.execSQL("DROP TABLE IF EXISTS TABLE_TRAINING");
         onCreate(db);
     }
 
-    public boolean insertContact (String stringInfo2) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("stringInfo", stringInfo2);
-        db.insert("dataaux", null, contentValues);
-        return true;
+    public void insertContent (String at, double pv, double av) {
+        // Create and/or open the database for writing
+        SQLiteDatabase db = getWritableDatabase();
+
+        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
+        // consistency of the database.
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(KEY_TRA_AT, at);
+            values.put(KEY_TRA_PV, pv);
+            values.put(KEY_TRA_AV, av);
+
+            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
+            db.insertOrThrow(TABLE_TRAINING, null, values);
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            System.out.println("ManualDeb: Error while trying to add post to database "+e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+
     }
 
-    public Cursor getData(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from dataaux ", null );
-        return res;
+    public void getAllPosts() {
+
+        // SELECT * FROM POSTS
+        // LEFT OUTER JOIN USERS
+        // ON POSTS.KEY_POST_USER_ID_FK = USERS.KEY_USER_ID
+        String POSTS_SELECT_QUERY =
+                String.format("SELECT * FROM %s",
+                        TABLE_TRAINING);
+
+        // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low
+        // disk space scenarios)
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(POSTS_SELECT_QUERY, null);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    System.out.println("ManualDeb: Data "+cursor.getString(cursor.getColumnIndex(KEY_TRA_ID))+
+                            cursor.getString(cursor.getColumnIndex(KEY_TRA_DATE))+" "
+                            +cursor.getString(cursor.getColumnIndex(KEY_TRA_AT))+" "+
+                            cursor.getString(cursor.getColumnIndex(KEY_TRA_PV))+" "+
+                            cursor.getString(cursor.getColumnIndex(KEY_TRA_AV)));
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            System.out.println("ManualDeb: Error while quering "+e.getMessage());
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
     }
 
-    public int numberOfRows(){
-        SQLiteDatabase db = this.getReadableDatabase();
-        int numRows = (int) DatabaseUtils.queryNumEntries(db, DATA_AUX);
-        return numRows;
-    }
-
-    public boolean updateContact (Integer id, String name, String phone, String email, String street,String place) {
-        /*SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put("name", name);
-        contentValues.put("phone", phone);
-        contentValues.put("email", email);
-        contentValues.put("street", street);
-        contentValues.put("place", place);
-        db.update("contacts", contentValues, "id = ? ", new String[] { Integer.toString(id) } );
-        return true;*/
-        return true;
-    }
-
-    /*public Integer deleteContact (Integer id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete("contacts",
-                "id = ? ",
-                new String[] { Integer.toString(id) });
-    }*/
-
-    public void getAllCotacts() {
-        ArrayList<String> array_list = new ArrayList<String>();
-
-        //hp = new HashMap();
-       /* SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "select * from dataaux", null );
-        res.moveToFirst();
-
-        while(res.isAfterLast() == false){
-            array_list.add(res.getString(res.getColumnIndex(stringInfo)));
-            System.out.println("ManualDeb: aqui: "+res.getString(res.getColumnIndex(stringInfo)));
-            res.moveToNext();
-        }*/
-        //return array_list;
-    }
 }

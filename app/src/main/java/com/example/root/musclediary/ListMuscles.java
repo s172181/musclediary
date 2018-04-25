@@ -54,7 +54,7 @@ public class ListMuscles extends AppCompatActivity {
 
         Intent i = getIntent();
         /*Commented wed*/
-        /*aux = (MyGlobals) i.getSerializableExtra("primObject");*/
+        aux = (MyGlobals) i.getSerializableExtra("primObject");
 
         //Spinner
         //get the spinner from the xml.
@@ -78,8 +78,8 @@ public class ListMuscles extends AppCompatActivity {
 
         connectSensor = (Button) findViewById(R.id.startRecord);
         /*Commented wed*/
-        /*connectSensor.setEnabled(false);
-        connectSensor.setBackgroundColor(0xFFFF0000);*/
+        connectSensor.setEnabled(false);
+        connectSensor.setBackgroundColor(0xFFFF0000);
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,8 +87,8 @@ public class ListMuscles extends AppCompatActivity {
 
                 Intent intent = new Intent(ListMuscles.this, LoadingScreen.class);
                 /*Commented wed*/
-                /*intent.putExtra("primObject", aux);
-                intent.putExtra("FILENAME", filename);*/
+                intent.putExtra("primObject", aux);
+                intent.putExtra("FILENAME", filename);
 
                 ListMuscles.this.startActivity(intent);
             }
@@ -115,7 +115,7 @@ public class ListMuscles extends AppCompatActivity {
         //Activate when state of shimmer is Login
         //Set the schedule function
         /*Commented wed*/
-        /*timer.scheduleAtFixedRate(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
               @Override
               public void run() {
                   // use runOnUiThread(Runnable action)
@@ -136,7 +136,7 @@ public class ListMuscles extends AppCompatActivity {
 
                   }
               },
-        0, 500);*/
+        0, 500);
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
