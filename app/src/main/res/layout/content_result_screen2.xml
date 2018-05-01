@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.root.musclediary.ResultScreen"
+    tools:showIn="@layout/activity_result_screen">
+
+    <FrameLayout
+        android:id="@+id/progressBarHolder"
+        android:animateLayoutChanges="true"
+        android:alpha="0.4"
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout0"
+            android:layout_below="@id/graph"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="30dp"
+            android:layout_alignParentRight="true"
+            android:baselineAligned="false">
+
+            <ImageView
+                android:id="@+id/zoomin0"
+                android:layout_width="25dp"
+                android:layout_marginTop="6dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/zoomin" />
+
+        </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <TextView
+                android:layout_height="200dip"
+                android:layout_width="wrap_content"
+                android:id="@+id/test"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:rotation="-90"
+                android:textSize="12dp"
+                android:text="EMG"/>
+            <!--<com.jjoe64.graphview.GraphView-->
+            <!--android:layout_height="200dip"-->
+            <!--android:layout_marginTop="20dp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:id="@+id/graph" />-->
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/graph"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_height="200dip"
+                android:layout_width="match_parent"/>
+
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_below="@id/graph"
+                android:id="@+id/test2"
+                android:layout_marginTop="10dp"
+                android:textColor="#000000"
+                android:gravity="center"
+                android:textSize="12dp"
+                android:text="Minutes"/>
+
+
+
+            <!--<com.github.mikephil.charting.charts.LineChart-->
+            <!--android:id="@+id/graph"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="200dip" />-->
+
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:id="@+id/progressBarsvalue"
+                android:layout_height="fill_parent"
+                android:visibility="gone"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="50dp"
+                android:layout_below="@id/test2"
+                android:orientation="vertical" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp"
+                    android:baselineAligned="false">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="0dp"
+                        android:textSize="25sp"
+                        android:text="Efficiency results:"
+                        />
+
+                    <ImageView
+                        android:id="@+id/infoev"
+                        android:layout_width="25dp"
+                        android:layout_marginTop="6dp"
+                        android:layout_height="25dp"
+                        android:layout_marginLeft="10dp"
+                        android:src="@drawable/infoq" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_below="@id/active"
+                    android:baselineAligned="false">
+
+                    <RelativeLayout
+                        android:id="@+id/relativeLayout11"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/title1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
+                            android:textSize="15sp"
+                            android:layout_alignParentLeft="true"
+                            android:text="Today's session:"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginTop="7dp"
+                            android:layout_marginRight="20dp"
+                            android:layout_alignParentRight="true"
+                            android:baselineAligned="false">
+
+                            <TextView
+                                android:id="@+id/title2"
+                                android:layout_width="70dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="0dp"
+                                android:textSize="15sp"
+                                android:layout_alignParentLeft="true"
+                                android:text="Last session:"
+                                />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="15dp"
+                    android:layout_below="@id/active"
+                    android:baselineAligned="false">
+
+                    <RelativeLayout
+                        android:id="@+id/relativeLayout1"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/active"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
+                            android:textSize="15sp"
+                            android:layout_alignParentLeft="true"
+                            android:text="Active training:"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginRight="50dp"
+                            android:layout_alignParentRight="true"
+                            android:baselineAligned="false">
+
+                            <ImageView
+                                android:id="@+id/imgtria1"
+                                android:layout_width="25dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_height="25dp"
+                                android:layout_marginLeft="10dp"
+                                android:src="@drawable/triandown" />
+                        <TextView
+                            android:id="@+id/activenumber"
+                            android:layout_width="30dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="7dp"
+                            android:textSize="15sp"
+                            android:layout_alignParentLeft="true"
+                            android:text="45%"
+                            />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+
+
+                </LinearLayout>
+
+
+
+                <!--<com.beardedhen.androidbootstrap.BootstrapProgressBar-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--app:animated="true"-->
+                <!--app:bootstrapBrand="warning"-->
+                <!--app:bootstrapProgress="78"-->
+                <!--app:striped="true"-->
+                <!--/>-->
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_below="@id/active"
+                    android:baselineAligned="false">
+
+
+                    <RelativeLayout
+                        android:id="@+id/relativeLayout2"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/peek"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
+                            android:textSize="15sp"
+                            android:layout_marginTop="15dp"
+                            android:text="Peak value"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginRight="50dp"
+                            android:layout_alignParentRight="true"
+                            android:baselineAligned="false">
+
+                            <ImageView
+                                android:id="@+id/imgtria2"
+                                android:layout_width="25dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_height="25dp"
+                                android:layout_marginLeft="10dp"
+                                android:src="@drawable/trianup" />
+                            <TextView
+                                android:id="@+id/maxampl"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="7dp"
+                                android:textSize="15sp"
+                                android:layout_alignParentLeft="true"
+                                android:text="25%"
+                                />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="5dp"
+                    android:layout_below="@id/active"
+                    android:baselineAligned="false">
+
+                    <RelativeLayout
+                        android:id="@+id/relativeLayout3"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/average"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
+                            android:textSize="15sp"
+                            android:layout_marginTop="15dp"
+                            android:text="Average EMG"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginRight="50dp"
+                            android:layout_alignParentRight="true"
+                            android:baselineAligned="false">
+
+                            <ImageView
+                                android:id="@+id/imgtria3"
+                                android:layout_width="25dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_height="25dp"
+                                android:layout_marginLeft="10dp"
+                                android:src="@drawable/trianup" />
+                            <TextView
+                                android:id="@+id/meanampl"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="7dp"
+                                android:textSize="15sp"
+                                android:layout_alignParentLeft="true"
+
+                                android:text="25%"
+                                />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/buttonConnect"
+                    android:layout_width="119dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorButton"
+                    android:text="Save Result"
+                    android:layout_marginBottom="30dp"
+                    android:textColor="#ffffff" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBarimg"
+            android:theme="@style/AppCompatAlertDialogStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            android:layout_gravity="center" />
+
+    </FrameLayout>
+
+
+
+
+</android.support.v4.widget.NestedScrollView>

@@ -25,7 +25,8 @@
         android:id="@+id/startRecord"
         android:layout_width="119dp"
         android:layout_height="wrap_content"
-        android:background="@color/colorButton"
+        android:background="@color/colorButtonGray"
+        android:alpha="0.5"
         app:layout_constraintTop_toTopOf="@+id/guideline"
         android:layout_marginTop="8dp"
         android:layout_marginRight="8dp"
@@ -34,6 +35,18 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:text="Start"
         android:textColor="#ffffff" />
+
+    <ProgressBar
+        android:id="@+id/progressconnection"
+        android:theme="@style/AppCompatAlertDialogStyle"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="88dp"
+        android:layout_marginLeft="8dp"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <android.support.constraint.Guideline
         android:layout_width="wrap_content"

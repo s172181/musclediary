@@ -1,9 +1,15 @@
 package com.example.root.musclediary;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.media.Image;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.TestLooperManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -38,16 +46,24 @@ import java.util.concurrent.TimeUnit;
 
 import com.beardedhen.androidbootstrap.BootstrapProgressBar;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.opencsv.CSVReader;
+
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -60,8 +76,12 @@ public class ResultScreen extends AppCompatActivity {
     ProgressBar progressBarStyleLarge;
     AlphaAnimation inAnimation;
     AlphaAnimation outAnimation;
+    private boolean loadingscreen = false;
 
     boolean loadinggraph = true;
+    private boolean usesensor = true;
+
+    private static DecimalFormat df2 = new DecimalFormat(".##");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +94,30 @@ public class ResultScreen extends AppCompatActivity {
         /*DBHelper databaseHelper = DBHelper.getInstance(this);
         databaseHelper.insertContent("0.5",0.6,0.7);
         databaseHelper.getAllPosts();*/
+        ImageView zoomin = (ImageView) findViewById(R.id.zoomin0);
+        zoomin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ResultScreen.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(ResultScreen.this);
+                }
+                builder.setTitle("Zoom")
+                        .setMessage("Zoom in and scroll through the graph to detail the electromyograph")
+                        .setPositiveButton("OK",null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+        TextView ttitle1 = (TextView) findViewById(R.id.title1);
+        ttitle1.setTypeface(null, Typeface.BOLD);
+        TextView ttitle2 = (TextView) findViewById(R.id.title2);
+        ttitle2.setTypeface(null, Typeface.BOLD);
+
+        usesensor = getIntent().getExtras().getBoolean("usesensor");
+        loadingscreen = getIntent().getExtras().getBoolean("loadingscreen");
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Result Screen");
@@ -108,21 +152,25 @@ public class ResultScreen extends AppCompatActivity {
                 try {
                     //Here we read from the file
                     //Change name of the file here
-                    /*final InputStream in = getAssets().open("EMGDataApr 25, 2018 11_24_21 AM.csv");
-                    //final InputStream in = getAssets().open("EMGDataApr 18, 2018 6_38_50 PM.csv");
-                    InputStreamReader csvStreamReader = new InputStreamReader(in);
-                    //CSVReader reader = new CSVReader(csvStreamReader, '\t');
-                    CSVReader reader = new CSVReader(csvStreamReader, ',');*/
+                    CSVReader reader;
+                    if (!usesensor) {
+                        final InputStream in = getAssets().open("Eder_250418.csv");
+                        //final InputStream in = getAssets().open("EMGDataApr 18, 2018 6_38_50 PM.csv");
+                        InputStreamReader csvStreamReader = new InputStreamReader(in);
+                        //CSVReader reader = new CSVReader(csvStreamReader, '\t');
+                        reader = new CSVReader(csvStreamReader, ',');
+                    }
+                    else {
+                        String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+                        String fileName = getIntent().getStringExtra("FILENAME");
 
-                    String uri = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-                    String fileName = getIntent().getStringExtra("FILENAME");
-
-                    uri=uri + File.separator + fileName;
-                    File file = new File(uri);
-                    System.out.println("ManualDeb: filename "+uri);
-                    FileInputStream fileInputStream = new FileInputStream(file);
-                    InputStreamReader csvStreamReader = new InputStreamReader(fileInputStream);
-                    CSVReader reader = new CSVReader(csvStreamReader, ',');
+                        uri = uri + File.separator + fileName;
+                        File file = new File(uri);
+                        System.out.println("ManualDeb: filename " + uri);
+                        FileInputStream fileInputStream = new FileInputStream(file);
+                        InputStreamReader csvStreamReader = new InputStreamReader(fileInputStream);
+                        reader = new CSVReader(csvStreamReader, ',');
+                    }
                     String[] nextLine;
                     float timestamp = 0;
                     float emg = 0;
@@ -166,6 +214,8 @@ public class ResultScreen extends AppCompatActivity {
                     e.printStackTrace();
                     System.out.println("ManualDeb: filename error "+e.getMessage());
                     Toast.makeText(ResultScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    //Getting emg average
+
                 }
 
                 SimpleMovingAverage TrainingAvgObj = new SimpleMovingAverage(it);
@@ -178,6 +228,7 @@ public class ResultScreen extends AppCompatActivity {
                     TrainingAvgObj.addData(i);
                     ChangeRate.addData(i);
                     peaks.add(ChangeRate.getChange());
+                    //System.out.println("ManualDeb: peaks %f"+ChangeRate.getChange());
                     if(ChangeRate.getChange() > 0.3 || ChangeRate.getChange() < -0.3) {
                         Active++;
                     }
@@ -188,6 +239,8 @@ public class ResultScreen extends AppCompatActivity {
                 }
                 Sum = Active + Inactive;
                 rate= (double)Active*100000/(double)Sum;
+
+
 
                 //Graph here
                 //y the times
@@ -207,15 +260,47 @@ public class ResultScreen extends AppCompatActivity {
                 chart.setData(lineData);
                 chart.invalidate();*/ // refresh
 
-                GraphView graphview = (GraphView) findViewById(R.id.graph);
-                LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
-                graphview.addSeries(series);
+                LineChart chart = (LineChart) findViewById(R.id.graph);
+                LineDataSet dataSet = new LineDataSet(entries, null);
+                chart.getLegend().setEnabled(false);
+                dataSet.setLineWidth(1f);
+                dataSet.setColor(Color.parseColor("#3953c7"));
+                dataSet.setDrawCircles(false);
+                dataSet.setDrawValues(false);
+
+                LineData lineData = new LineData(dataSet);
+                lineData.setValueFormatter(new MyValueFormatter());
+
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+                xAxis.setValueFormatter(new IAxisValueFormatter()
+                { @Override
+                public String getFormattedValue(float value, AxisBase axis)
+                {
+                    String val1 = String.format("%d", TimeUnit.MILLISECONDS.toMinutes((long) value)
+                    );
+                    String val3 = String.format("%d", TimeUnit.MILLISECONDS.toSeconds((long) value) -
+                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) value))
+                    );
+                    return val1+":"+val3;
+                }
+                });
+                YAxis right = chart.getAxisRight();
+                right.setDrawLabels(false);
+
+                chart.setData(lineData);
+                chart.getDescription().setEnabled(false);
+                chart.invalidate();
+
+                //GraphView graphview = (GraphView) findViewById(R.id.graph);
+                //LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
+                //graphview.addSeries(series);
 
                 // activate horizontal zooming and scrolling
-                graphview.getViewport().setScalable(true);
+                //graphview.getViewport().setScalable(true);
 
                 // activate horizontal scrolling
-                NumberFormat nf = NumberFormat.getInstance();
+                /*NumberFormat nf = NumberFormat.getInstance();
 
                 // custom label formatter to show currency "EUR"
                 graphview.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
@@ -234,7 +319,7 @@ public class ResultScreen extends AppCompatActivity {
                     }
                 });
 
-                graphview.getViewport().setScrollable(true);
+                graphview.getViewport().setScrollable(true);*/
 
                 // set manual X bounds
                 //graphview.getViewport().setXAxisBoundsManual(true);
@@ -253,26 +338,53 @@ public class ResultScreen extends AppCompatActivity {
 
                 //Progress bar
                 TextView barnum = (TextView) findViewById(R.id.peek);
-                barnum.setText("Peek value: " + Collections.max(peaks));
+                barnum.setText("Maximum amplitude: " + String.format("%.2f", Collections.max(peaks)));
 
                 TextView barnum1 = (TextView) findViewById(R.id.average);
-                barnum1.setText("Average value: " + TrainingAvgObj.getMean());
+                //barnum1.setText("Average value: " + TrainingAvgObj.getMean());
+                barnum1.setText("Mean amplitude " + String.format("%.2f", ChangeRate.getAverageEMG()));
 
                 TextView barnum2 = (TextView) findViewById(R.id.active);
-                barnum2.setText("Active training in %: " + Math.round(rate));
+                barnum2.setText("Active training: " + Math.round(rate)+" %");
+                /*ProgressBar bar2 = (ProgressBar) findViewById(R.id.activenegbar);
+                bar2.setIndeterminateDrawable(context.getResources().getDrawable(R.drawable.activenegbar));*/
                 loadinggraph = false;
                 //BootstrapProgressBar bar = (BootstrapProgressBar) findViewById(R.id.peekvalue);
                 //bar.setProgress(peakvalue);
             }
-            }, 1000);   //2 seconds
+        }, 1000);   //2 seconds
+
+        ImageView infoactive = findViewById(R.id.infoev);
+        infoactive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ResultScreen.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(ResultScreen.this);
+                }
+                builder.setTitle("Results meaning")
+                        .setMessage("Active training: It shows fraction of the training time that muscle was kept active \n\n"
+                                +"Maximum amplitude: Shows peak amplitude of EMG within training that represents the most significant repetition\n\n"
+                                +"Mean amplitude: Represents average of all amplitudes within a training, that corresponds to the real efficiency of the training\n\n")
+                        .setPositiveButton("OK",null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
 
         finish();
-        Intent intent = new Intent(ResultScreen.this, ListMuscles.class);
-        startActivity(intent);
+        if (loadingscreen) {
+            Intent intent = new Intent(ResultScreen.this, ListMuscles.class);
+            intent.putExtra("usesensor", usesensor);
+            startActivity(intent);
+        }
+
     }
 
     private class MyTask extends AsyncTask<Void, Void, Void> {
@@ -353,6 +465,10 @@ public class ResultScreen extends AppCompatActivity {
         private double sum;
         double valuechange= 0;
         int counter=0;
+        //Average EMG 2
+        double averEMG = 0;
+        int numberPeriods = 0;
+
         // constructor to initialize period
         public SimpleMovingAverage(int period) {
             this.period = period;
@@ -382,6 +498,9 @@ public class ResultScreen extends AppCompatActivity {
             return sum / period;
         }
 
+        public double getAverageEMG() { System.out.println("ManualDeb: "+averEMG+" "+numberPeriods);
+            return averEMG/numberPeriods;}
+
         public double getChange() {
             if(counter==0) {
                 double min = Double.MAX_VALUE;
@@ -390,6 +509,8 @@ public class ResultScreen extends AppCompatActivity {
                 min = (double) Collections.min(array);
                 max = (double) Collections.max(array);
                 valuechange = max - min;
+                averEMG += valuechange;
+                numberPeriods++;
                 return valuechange;
             }
             else  return  0;
@@ -397,5 +518,20 @@ public class ResultScreen extends AppCompatActivity {
 
 
 
+    }
+
+    public class MyValueFormatter implements IValueFormatter {
+
+        private DecimalFormat mFormat;
+
+        public MyValueFormatter() {
+            mFormat = new DecimalFormat("###,###,##0.0"); // use one decimal
+        }
+
+        @Override
+        public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
+            // write your logic here
+            return mFormat.format(value) + " $"; // e.g. append a dollar-sign
+        }
     }
 }

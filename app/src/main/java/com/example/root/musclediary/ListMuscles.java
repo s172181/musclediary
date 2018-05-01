@@ -2,6 +2,7 @@ package com.example.root.musclediary;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +15,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Activity;
@@ -24,6 +27,7 @@ import java.util.TimerTask;
 import android.widget.ArrayAdapter;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -41,6 +45,8 @@ public class ListMuscles extends AppCompatActivity {
     private String filename = "";
     Timer timer = new Timer();
     Button connectSensor = null;
+    private boolean usesensor= true;
+    ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +55,45 @@ public class ListMuscles extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        TextView helpsensorc = (TextView) findViewById(R.id.connectsensor);
+        String udata="How to connect sensor pads";
+        SpannableString content = new SpannableString(udata);
+        content.setSpan(new UnderlineSpan(), 0, udata.length(), 0);
+        helpsensorc.setText(content);
+        helpsensorc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ListMuscles.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(ListMuscles.this);
+                }
+                builder.setTitle("Shimmer Sensor")
+                        .setMessage("To connect the sensor ... ")
+                        .setPositiveButton("OK",null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("List Muscles");
 
         Intent i = getIntent();
+        usesensor = getIntent().getExtras().getBoolean("usesensor");
         /*Commented wed*/
-        aux = (MyGlobals) i.getSerializableExtra("primObject");
+        connectSensor = (Button) findViewById(R.id.startRecord);
+        pb = (ProgressBar) findViewById(R.id.progressconnection);
+        if (usesensor) {
+            aux = (MyGlobals) i.getSerializableExtra("primObject");
+            pb.setVisibility(View.VISIBLE);
+            connectSensor.setEnabled(false);
+        }
+        else {
+            connectSensor.setAlpha(1);
+            connectSensor.setBackgroundColor(getResources().getColor(R.color.colorButton));
+        }
 
         //Spinner
         //get the spinner from the xml.
@@ -76,10 +115,8 @@ public class ListMuscles extends AppCompatActivity {
         macAdd = getIntent().getStringExtra("ITEM_EXTRA");
         filename = getIntent().getStringExtra("FILENAME");
 
-        connectSensor = (Button) findViewById(R.id.startRecord);
+
         /*Commented wed*/
-        connectSensor.setEnabled(false);
-        connectSensor.setBackgroundColor(0xFFFF0000);
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,14 +124,17 @@ public class ListMuscles extends AppCompatActivity {
 
                 Intent intent = new Intent(ListMuscles.this, LoadingScreen.class);
                 /*Commented wed*/
-                intent.putExtra("primObject", aux);
-                intent.putExtra("FILENAME", filename);
+                if (usesensor) {
+                    intent.putExtra("primObject", aux);
+                    intent.putExtra("FILENAME", filename);
+                }
+                intent.putExtra("usesensor", usesensor);
 
                 ListMuscles.this.startActivity(intent);
             }
         });
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        /*FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,33 +150,37 @@ public class ListMuscles extends AppCompatActivity {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
             }
-        });
+        });*/
 
         //Activate when state of shimmer is Login
         //Set the schedule function
         /*Commented wed*/
-        timer.scheduleAtFixedRate(new TimerTask() {
-              @Override
-              public void run() {
-                  // use runOnUiThread(Runnable action)
-                  runOnUiThread(new Runnable() {
-                      @Override
-                      public void run() {
-                          // Magic here
-                          //connectSensor.setEnabled(true);
-                          if (aux!=null) {
-                              if (aux.getStateShimmer().equals("SD Logging")) {
-                                  connectSensor.setEnabled(true);
-                                  connectSensor.setBackgroundColor(getResources().getColor(R.color.colorButton));
-                                  timer.cancel();
-                              }
-                          }
-                      }
-                  });
+        if (usesensor) {
+            timer.scheduleAtFixedRate(new TimerTask() {
+                                          @Override
+                                          public void run() {
+                                              // use runOnUiThread(Runnable action)
+                                              runOnUiThread(new Runnable() {
+                                                  @Override
+                                                  public void run() {
+                                                      // Magic here
+                                                      //connectSensor.setEnabled(true);
+                                                      if (aux != null) {
+                                                          if (aux.getStateShimmer().equals("SD Logging")) {
+                                                              connectSensor.setEnabled(true);
+                                                              connectSensor.setAlpha(1);
+                                                              connectSensor.setBackgroundColor(getResources().getColor(R.color.colorButton));
+                                                              pb.setVisibility(View.GONE);
+                                                              timer.cancel();
+                                                          }
+                                                      }
+                                                  }
+                                              });
 
-                  }
-              },
-        0, 500);
+                                          }
+                                      },
+                    0, 500);
+        }
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -159,12 +203,6 @@ public class ListMuscles extends AppCompatActivity {
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.nav_hist:
-                fragmentClass = MyHistory.class;
-                break;
-            case R.id.nav_exer:
-                fragmentClass = MyHistory.class;
-                break;
-            case R.id.nav_feed:
                 fragmentClass = MyHistory.class;
                 break;
             default:

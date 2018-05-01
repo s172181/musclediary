@@ -74,7 +74,6 @@ public class TabFragment1 extends Fragment {
         montlyb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("ManualDeb: 2222");
                 montlyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border));
                 weeklyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border2));
 

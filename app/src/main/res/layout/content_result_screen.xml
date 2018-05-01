@@ -9,7 +9,7 @@
     android:fillViewport="true"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.root.musclediary.ResultScreen"
-    tools:showIn="@layout/activity_result_screen">
+    tools:showIn="@layout/activity_result_screen2">
 
     <FrameLayout
         android:id="@+id/progressBarHolder"
@@ -23,11 +23,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <com.jjoe64.graphview.GraphView
+
+        <TextView
             android:layout_height="200dip"
-            android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
-            android:id="@+id/graph" />
+            android:id="@+id/test"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:rotation="-90"
+            android:textSize="12dp"
+            android:text="EMG"/>
+    <!--<com.jjoe64.graphview.GraphView-->
+            <!--android:layout_height="200dip"-->
+            <!--android:layout_marginTop="20dp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:id="@+id/graph" />-->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/graph"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_height="200dip"
+            android:layout_width="match_parent"/>
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_below="@id/graph"
+            android:id="@+id/test2"
+            android:layout_marginTop="5dp"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:textSize="12dp"
+            android:text="Minutes"/>
 
         <!--<com.github.mikephil.charting.charts.LineChart-->
             <!--android:id="@+id/graph"-->
@@ -39,24 +65,50 @@
         android:id="@+id/progressBarsvalue"
         android:layout_height="fill_parent"
         android:layout_marginRight="50dp"
-        android:layout_marginTop="50dp"
-        android:visibility="gone"
+        android:layout_marginTop="30dp"
         android:layout_marginLeft="50dp"
-        android:layout_below="@id/graph"
+        android:visibility="gone"
+        android:layout_below="@id/test2"
         android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/title"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:textSize="25sp"
-            android:text="Efficiency"
-            />
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:baselineAligned="false">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:textSize="25sp"
+                android:text="Efficiency"
+                />
+
+            <ImageView
+                android:id="@+id/infoev"
+                android:layout_width="25dp"
+                android:layout_marginTop="6dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/infoq" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_below="@id/active"
+            android:baselineAligned="false">
 
         <TextView
             android:id="@+id/active"
-            android:layout_marginTop="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="0dp"
@@ -64,58 +116,185 @@
             android:text="Active training"
             />
 
-        <com.beardedhen.androidbootstrap.BootstrapProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:animated="true"
-            app:bootstrapBrand="warning"
-            app:bootstrapProgress="78"
-            app:striped="true"
-            />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/peek"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:textSize="15sp"
-            android:text="Peak value"
-            />
+            android:orientation="horizontal"
+            android:layout_below="@id/active"
+            android:baselineAligned="false">
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/activenegbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressTint="#c31b00"
+                    android:progressBackgroundTint="#a7a7a7"
+                    android:layout_width="match_parent"
+                    android:rotation="180"
+                    android:layout_height="wrap_content"
+                    android:progress="50"/>
+            </RelativeLayout>
+            <View
+                android:layout_width="2dp"
+                android:layout_height="15dp"
+                android:background="#a7a7a7"/>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_height="20dp"
+                android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/activeposbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressTint="#c31b00"
+                    android:progressBackgroundTint="#a7a7a7"
+                    android:layout_width="match_parent"
+                    android:rotation="180"
+                    android:layout_height="wrap_content"
+                    android:progress="0"/>
+            </RelativeLayout>
+        </LinearLayout>
 
-        <com.beardedhen.androidbootstrap.BootstrapProgressBar
-            android:id="@+id/peekvalue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:animated="true"
-            app:bootstrapBrand="warning"
-            app:bootstrapProgress="78"
-            app:striped="true"
-            />
+        <!--<com.beardedhen.androidbootstrap.BootstrapProgressBar-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:animated="true"-->
+            <!--app:bootstrapBrand="warning"-->
+            <!--app:bootstrapProgress="78"-->
+            <!--app:striped="true"-->
+            <!--/>-->
 
-        <TextView
-            android:id="@+id/average"
-            android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="0dp"
-            android:textSize="15sp"
-            android:text="Average EMG"
-            />
 
-        <com.beardedhen.androidbootstrap.BootstrapProgressBar
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:animated="true"
-            android:layout_marginBottom="20dp"
-            app:bootstrapBrand="warning"
-            app:bootstrapProgress="78"
-            app:striped="true"
-            />
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_below="@id/active"
+            android:baselineAligned="false">
+
+            <TextView
+                android:id="@+id/peek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:textSize="15sp"
+                android:text="Peak value"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/peaknegbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressTint="#c31b00"
+                    android:progressBackgroundTint="#a7a7a7"
+                    android:layout_width="match_parent"
+                    android:rotation="180"
+                    android:layout_height="wrap_content"
+                    android:progress="0"/>
+            </RelativeLayout>
+            <View
+                android:layout_width="2dp"
+                android:layout_height="15dp"
+                android:background="#a7a7a7"/>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_height="20dp"
+                android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/peakposbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressTint="#008a07"
+                    android:progressBackgroundTint="#a7a7a7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="50"/>
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="15dp"
+            android:layout_below="@id/active"
+            android:baselineAligned="false">
+
+            <TextView
+                android:id="@+id/average"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:textSize="15sp"
+                android:text="Average EMG"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false">
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="0dp"
+                android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/avernegbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressTint="#c31b00"
+                    android:progressBackgroundTint="#a7a7a7"
+                    android:layout_width="match_parent"
+                    android:rotation="180"
+                    android:layout_height="wrap_content"
+                    android:progress="0"/>
+            </RelativeLayout>
+            <View
+                android:layout_width="2dp"
+                android:layout_height="15dp"
+                android:background="#a7a7a7"/>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_height="20dp"
+                android:layout_weight="1">
+                <ProgressBar
+                    android:id="@+id/averposbar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressTint="#008a07"
+                    android:progressBackgroundTint="#a7a7a7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progress="50"/>
+            </RelativeLayout>
+        </LinearLayout>
 
         <Button
             android:id="@+id/buttonConnect"
             android:layout_width="119dp"
+            android:layout_marginTop="20dp"
             android:layout_height="wrap_content"
             android:background="@color/colorButton"
             android:text="Save Result"

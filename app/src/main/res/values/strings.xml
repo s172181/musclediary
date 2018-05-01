@@ -13,4 +13,9 @@
     <string name="connect_text">Connect to sensor via bluetooth</string>
     <string name="title_activity_result_screen">ResultScreen</string>
     <string name="title_activity_loading_screen">LoadingScreen</string>
+
+    <string name="progressbarn"></string>
+    <string name="connectsensor"><u>How to connect sensor pads</u></string>
+
+    <string name="tsessin"><b>Today's session</b></string>
 </resources>

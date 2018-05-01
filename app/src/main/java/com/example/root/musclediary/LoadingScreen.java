@@ -43,12 +43,14 @@ public class LoadingScreen extends AppCompatActivity {
     ShimmerBluetoothManagerAndroid btManager;
     MyGlobals aux2 = new MyGlobals();
     private String filename = "";
+    private boolean loadingscreen = true;
 
     //Chronometer
     Chronometer cmTimer;
     Button btnStart, btnStop;
     long elapsedTime;
     String TAG = "TAG";
+    private boolean usesensor = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,7 @@ public class LoadingScreen extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Streaming");
+        usesensor = getIntent().getExtras().getBoolean("usesensor");
 
         cmTimer = (Chronometer) findViewById(R.id.cmTimer);
 
@@ -79,9 +82,11 @@ public class LoadingScreen extends AppCompatActivity {
         //Start BTshimmer
         Intent i = getIntent();
         /*Commented wed*/
-        aux2 = (MyGlobals) i.getSerializableExtra("primObject");
-        filename = getIntent().getStringExtra("FILENAME");
-        aux2.startBT();
+        if (usesensor) {
+            aux2 = (MyGlobals) i.getSerializableExtra("primObject");
+            filename = getIntent().getStringExtra("FILENAME");
+            aux2.startBT();
+        }
 
         //Stop recording
         final Button connectSensor = (Button) findViewById(R.id.stopRecording);
@@ -92,11 +97,15 @@ public class LoadingScreen extends AppCompatActivity {
                 cmTimer.stop();
                 cmTimer.setText("");
                 /*Commented wed*/
-                aux2.stopBT();
+                if (usesensor) {
+                    aux2.stopBT();
+                }
 
                 //Go to resultscreen
                 Intent intent = new Intent(LoadingScreen.this, ResultScreen.class);
+                intent.putExtra("usesensor", usesensor);
                 intent.putExtra("FILENAME", filename);
+                intent.putExtra("loadingscreen",loadingscreen);
                 LoadingScreen.this.startActivity(intent);
             }
         });

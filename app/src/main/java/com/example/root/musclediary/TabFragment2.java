@@ -1,6 +1,7 @@
 package com.example.root.musclediary;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
@@ -31,12 +33,14 @@ import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
 public class TabFragment2 extends Fragment {
 
     BarChart chart;
+    TextView legendx;
 
     float barWidth = 0.3f;
     float barSpace = 0f;
@@ -48,30 +52,49 @@ public class TabFragment2 extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_tab_fragment2, container, false);
         chart = (BarChart) v.findViewById(R.id.chart2);
+        legendx  = (TextView) v.findViewById(R.id.graphbarlegend);
 
 
 
         final Button montlyb = (Button) v.findViewById(R.id.montlyb);
         final Button weeklyb = (Button) v.findViewById(R.id.weeklyb);
         final Button dailyb = (Button) v.findViewById(R.id.dailyb);
-        final CalendarView calendar = (CalendarView) v.findViewById(R.id.calendarView);
+        final CalendarView calendarv = (CalendarView) v.findViewById(R.id.calendarView);
         dailyb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calendar.setVisibility(View.VISIBLE);
+                calendarv.setVisibility(View.VISIBLE);
                 chart.setVisibility(View.GONE);
+                legendx.setVisibility(View.GONE);
 
                 dailyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border));
                 weeklyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border2));
                 montlyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border2));
             }
         });
+        calendarv.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                int dayOfWeek = calendar.get(Calendar.DAY_OF_MONTH);
+                int monOfWeek = calendar.get(Calendar.MONTH);
+                if (dayOfMonth==9 && monOfWeek==4) {
+                    Intent intent = new Intent(getActivity(), ResultScreen.class);
+                    intent.putExtra("usesensor", false);
+                    intent.putExtra("loadingscreen", false);
+                    startActivity(intent);
+                }
+            }
+        });
 
         weeklyb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calendar.setVisibility(View.GONE);
+                calendarv.setVisibility(View.GONE);
                 chart.setVisibility(View.VISIBLE);
+                legendx.setVisibility(View.VISIBLE);
 
                 dailyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border2));
                 weeklyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border));
@@ -84,8 +107,9 @@ public class TabFragment2 extends Fragment {
         montlyb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calendar.setVisibility(View.GONE);
+                calendarv.setVisibility(View.GONE);
                 chart.setVisibility(View.VISIBLE);
+                legendx.setVisibility(View.VISIBLE);
 
                 dailyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border2));
                 montlyb.setBackground(ContextCompat.getDrawable(getActivity(), R.drawable.button_border));

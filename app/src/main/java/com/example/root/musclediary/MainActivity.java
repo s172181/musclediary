@@ -2,6 +2,8 @@ package com.example.root.musclediary;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -65,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private BufferedWriter bw;
     private File file;
     private String fileName = "";
+    private boolean usesensor = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +77,32 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //If we are using handler or not
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(MainActivity.this);
+        }
+        builder.setTitle("Shimmer Sensor")
+                .setMessage("Do you want to use sensor or skip it?")
+                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue with delete
+                    }
+                })
+                .setNegativeButton("skip", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                        usesensor = false;
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
         /*Commented wed*/
-        aux.setBTHandler(this,mHandler);
+        if (usesensor)
+            aux.setBTHandler(this,mHandler);
 
         //Check if permission to write to external storage has been granted
         //This is to write the csv file into the external storage
@@ -91,9 +119,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 /*Commented wed*/
-                startbluet();
-                /*Intent intent = new Intent(MainActivity.this, ListMuscles.class);
-                MainActivity.this.startActivity(intent);*/
+                if (usesensor)
+                    startbluet();
+                else {
+                    Intent intent = new Intent(MainActivity.this, ListMuscles.class);
+                    intent.putExtra("usesensor", usesensor);
+                    MainActivity.this.startActivity(intent);
+                }
             }
         });
 
@@ -112,18 +144,20 @@ public class MainActivity extends AppCompatActivity {
 
         //Setup CSV writing
         /*Commented wed*/
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        fileName = "EMGData" + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
-        String filePath = baseDir + File.separator + fileName;
-        file = new File(filePath);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
+        if (usesensor) {
+            String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+            fileName = "EMGData" + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
+            String filePath = baseDir + File.separator + fileName;
+            file = new File(filePath);
+            try {
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                fw = new FileWriter(file.getAbsoluteFile());
+                bw = new BufferedWriter(fw);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            fw = new FileWriter(file.getAbsoluteFile());
-            bw = new BufferedWriter(fw);
-        } catch(IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -137,20 +171,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         /*Commented wed*/
-        if(requestCode == 2) {
-            if (resultCode == Activity.RESULT_OK) {
-                //Get the Bluetooth mac address of the selected device:
-                String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
-                aux.setBT(macAdd);
-                Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, ListMuscles.class);
-                intent.putExtra("primObject", aux);
-                intent.putExtra("FILENAME", fileName); //Get the Bluetooth mac address of the selected device
-                MainActivity.this.startActivity(intent);
-            }
-            else
-                Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
+        if (usesensor) {
+            if (requestCode == 2) {
+                if (resultCode == Activity.RESULT_OK) {
+                    //Get the Bluetooth mac address of the selected device:
+                    String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
+                    aux.setBT(macAdd);
+                    Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, ListMuscles.class);
+                    intent.putExtra("primObject", aux);
+                    intent.putExtra("usesensor", usesensor);
+                    intent.putExtra("FILENAME", fileName); //Get the Bluetooth mac address of the selected device
+                    MainActivity.this.startActivity(intent);
+                } else
+                    Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
 
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -189,12 +225,6 @@ public class MainActivity extends AppCompatActivity {
         Class fragmentClass;
         switch(menuItem.getItemId()) {
             case R.id.nav_hist:
-                fragmentClass = MyHistory.class;
-                break;
-            case R.id.nav_exer:
-                fragmentClass = MyHistory.class;
-                break;
-            case R.id.nav_feed:
                 fragmentClass = MyHistory.class;
                 break;
             default:
