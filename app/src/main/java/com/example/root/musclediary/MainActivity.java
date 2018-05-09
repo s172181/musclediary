@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     //Get the Bluetooth mac address of the selected device:
                     String macAdd = data.getStringExtra(EXTRA_DEVICE_ADDRESS);
                     aux.setBT(macAdd);
-                    Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, ListMuscles.class);
                     intent.putExtra("primObject", aux);
                     intent.putExtra("usesensor", usesensor);

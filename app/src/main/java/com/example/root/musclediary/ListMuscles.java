@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.app.Activity;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -136,6 +137,9 @@ public class ListMuscles extends AppCompatActivity {
                                                               connectSensor.setBackgroundColor(getResources().getColor(R.color.colorButton));
                                                               pb.setVisibility(View.GONE);
                                                               timer.cancel();
+                                                          }
+                                                          else if (aux.getStateShimmer().equals("Disconnected")) {
+                                                              Toast.makeText(ListMuscles.this, "Error in connection, please go back and start again", Toast.LENGTH_SHORT).show();
                                                           }
                                                       }
                                                   }
