@@ -31,6 +31,13 @@ import java.util.List;
 
 public class TabFragment1 extends Fragment {
 
+    /*
+    * This subfragment displays the piechart of percentage of training
+    * muscles
+    * Data here is static, the saving and extraction of data from db is
+     * still to be implemented
+     */
+
     PieChart pieChart ;
     ArrayList<PieEntry> entries ;
     ArrayList<PieEntry> entries2 ;
@@ -48,6 +55,7 @@ public class TabFragment1 extends Fragment {
 
         //Weekly
         pieChart = (PieChart) v.findViewById(R.id.chart1);
+        pieChart.getDescription().setEnabled(false);
         entries = new ArrayList<PieEntry>();
         PieEntryLabels = new ArrayList<String>();
         AddValuesToPIEENTRY(1);
@@ -122,6 +130,10 @@ public class TabFragment1 extends Fragment {
 
     public void AddValuesToPIEENTRY(int type){
 
+        /*
+        * This is fake data. Used to display an example of history screen.
+        * It yet has to be implemented.
+         */
         if (type==1) {
             entries = new ArrayList<PieEntry>();
             entries.add(new PieEntry(18.5f, "Upper Leg"));

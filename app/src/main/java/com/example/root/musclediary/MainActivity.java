@@ -77,7 +77,14 @@ public class MainActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //If we are using handler or not
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Mucle Diary");
+
+        /*
+        * This is to use check if user wants to connect to sensor and load data from it
+        *  or skip this to be able to navigate to result screen where sample data
+        *  will be shown
+         */
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(MainActivity.this, android.R.style.Theme_Material_Dialog_Alert);
@@ -85,22 +92,21 @@ public class MainActivity extends AppCompatActivity {
             builder = new AlertDialog.Builder(MainActivity.this);
         }
         builder.setTitle("Shimmer Sensor")
-                .setMessage("Do you want to use sensor or skip it?")
+                .setMessage("Do you want to use a Shimmer sensor or skip this to navigate the app?")
                 .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
+                        //
                     }
                 })
                 .setNegativeButton("skip", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
+                        //
                         usesensor = false;
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
 
-        /*Commented wed*/
         if (usesensor)
             aux.setBTHandler(this,mHandler);
 
@@ -118,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Commented wed*/
                 if (usesensor)
                     startbluet();
                 else {
@@ -137,13 +142,9 @@ public class MainActivity extends AppCompatActivity {
         toggle.syncState();
 
         nvDrawer = (NavigationView) findViewById(R.id.nav_view);
-        //navigationView.setNavigationItemSelectedListener(this);
-        // Setup drawer view
         setupDrawerContent(nvDrawer);
 
-
         //Setup CSV writing
-        /*Commented wed*/
         if (usesensor) {
             String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
             fileName = "EMGData" + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
@@ -163,14 +164,14 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Get the result from the paired devices dialog
+     *  Here after connected to the shimmer via bluetooth it goes to the ListMuscle screens
+     *   and add the  object that contains ShimmerBluetoothManagerAndroid to the intent
      * @param requestCode
      * @param resultCode
      * @param data
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        /*Commented wed*/
         if (usesensor) {
             if (requestCode == 2) {
                 if (resultCode == Activity.RESULT_OK) {
@@ -268,15 +269,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
         switch (item.getItemId()) {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
@@ -285,27 +277,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_hist) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_hist) {
-//
-//        } else if (id == R.id.nav_exer) {
-//
-//        } else if (id == R.id.nav_feed) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 
     /**
      * Permission request callback for writing storage
@@ -327,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        // put your code here...
         mHandler.removeCallbacksAndMessages(null);
         mHandler.removeCallbacks(null);
         aux = new MyGlobals();
@@ -336,6 +306,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /*
+    * This handler is stracted from the API Shimmer examples and slightly modified
+    *  this handles the communication with shimmer and extraction of data
+    *   it starts from MainScreen and its bound to it, so it runs in background
+     */
     //android.os.Handler allows us to send and process Message and Runnable
     // objects associated with a thread's MessageQueue. Each Handler
     // instance is associated with a single thread and that thread's message queue.

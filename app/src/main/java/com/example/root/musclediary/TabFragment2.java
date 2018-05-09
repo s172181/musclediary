@@ -39,6 +39,13 @@ import java.util.List;
 
 public class TabFragment2 extends Fragment {
 
+    /*
+    * This subfragment displays the barcharts of main amplitude EMG
+    *  only for the calf muscle
+    * Data here is static, the saving and extraction of data from db is
+     * still to be implemented
+     */
+
     BarChart chart;
     TextView legendx;
 
@@ -59,6 +66,13 @@ public class TabFragment2 extends Fragment {
         final Button montlyb = (Button) v.findViewById(R.id.montlyb);
         final Button weeklyb = (Button) v.findViewById(R.id.weeklyb);
         final Button dailyb = (Button) v.findViewById(R.id.dailyb);
+
+        /*
+        * This displays the calendar
+        * It's fake data so in this example when user selects 9 of may
+        *  it goes to the result screen. This is to show an example of the functionallity.
+        *  It has yet to be implemented.
+         */
         final CalendarView calendarv = (CalendarView) v.findViewById(R.id.calendarView);
         dailyb.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,7 +144,7 @@ public class TabFragment2 extends Fragment {
         //Yaxis left values
         YAxis left = chart.getAxisLeft();
         left.setAxisMinimum(0);
-        left.setAxisMaximum(100);
+        left.setAxisMaximum(12);
         left.setLabelCount(12);
         left.setDrawTopYLabelEntry(true);
         //Yaxis right values
@@ -174,29 +188,33 @@ public class TabFragment2 extends Fragment {
 
     private List<IBarDataSet> getBarData(int type){
         ArrayList<BarEntry> entries = new ArrayList<>();
+        /*
+        * This is fake data. Used to display an example of history screen.
+        * It yet has to be implemented.
+         */
         if (type==0) {
             entries.add(new BarEntry(1, (float) 1));
-            entries.add(new BarEntry(2, (float) 11));
-            entries.add(new BarEntry(3, (float) 7));
-            entries.add(new BarEntry(4, (float) 16));
-            entries.add(new BarEntry(5, (float) 35));
-            entries.add(new BarEntry(6, (float) 21));
-            entries.add(new BarEntry(7, (float) 40));
+            entries.add(new BarEntry(2, (float) 2.5));
+            entries.add(new BarEntry(3, (float) 5.1));
+            entries.add(new BarEntry(4, (float) 4.3));
+            entries.add(new BarEntry(5, (float) 2.1));
+            entries.add(new BarEntry(6, (float) 4.3));
+            entries.add(new BarEntry(7, (float) 6.9));
 
         }
         else {
-            entries.add(new BarEntry(1, (float) 34));
-            entries.add(new BarEntry(2, (float) 8));
-            entries.add(new BarEntry(3, (float) 3));
-            entries.add(new BarEntry(4, (float) 78));
-            entries.add(new BarEntry(5, (float) 55));
-            entries.add(new BarEntry(6, (float) 44));
-            entries.add(new BarEntry(7, (float) 21));
-            entries.add(new BarEntry(8, (float) 14));
-            entries.add(new BarEntry(9, (float) 14));
-            entries.add(new BarEntry(10, (float) 19));
-            entries.add(new BarEntry(11, (float) 27));
-            entries.add(new BarEntry(12, (float) 87));
+            entries.add(new BarEntry(1, (float) 2.6));
+            entries.add(new BarEntry(2, (float) 7.6));
+            entries.add(new BarEntry(3, (float) 2.7));
+            entries.add(new BarEntry(4, (float) 7.9));
+            entries.add(new BarEntry(5, (float) 4.3));
+            entries.add(new BarEntry(6, (float) 5.6));
+            entries.add(new BarEntry(7, (float) 7.8));
+            entries.add(new BarEntry(8, (float) 2.3));
+            entries.add(new BarEntry(9, (float) 6.9));
+            entries.add(new BarEntry(10, (float) 4.7));
+            entries.add(new BarEntry(11, (float) 8.9));
+            entries.add(new BarEntry(12, (float) 7.9));
         }
 
         List<IBarDataSet> bars = new ArrayList<>();

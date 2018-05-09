@@ -22,15 +22,15 @@
 
     <include layout="@layout/content_list_muscles" />
 
-    <TextView
-        android:id="@+id/connectsensor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#0000EE"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="@string/connectsensor"
-        android:textSize="14dp"/>
+    <!--<TextView-->
+        <!--android:id="@+id/connectsensor"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textColor="#0000EE"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_margin="@dimen/fab_margin"-->
+        <!--android:text="@string/connectsensor"-->
+        <!--android:textSize="14dp"/>-->
 
     <!--<android.support.design.widget.FloatingActionButton-->
     <!--android:id="@+id/fab"-->

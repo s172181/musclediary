@@ -12,6 +12,10 @@ import android.view.ViewGroup;
 
 public class TabFragment3 extends Fragment {
 
+    /*
+    *Not implemented.
+     */
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

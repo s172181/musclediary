@@ -20,10 +20,15 @@ import android.os.Handler;
 import com.example.root.musclediary.DBHelper;
 
 /**
- * Created by root on 4/10/18.
+ * Class to handle the Shimmer API objects through all the activities
+ * It contains static objects that handle the bluetooth connection with shimmer
+ * sensor (shimmer and btManagerGlobal) and extraction of data.
+ * Data is written in a csv file using FileWriter and Buffered Writer.
  */
 
 public class MyGlobals implements Serializable {
+
+
     public static ShimmerBluetoothManagerAndroid btManagerGlobal;
     //Write to CSV variables
     public static FileOutputStream outputStreamGlobal;
@@ -54,12 +59,11 @@ public class MyGlobals implements Serializable {
         return this.stateShimmer2;
     }
 
+    //Connection with shimmer via bluetooth
     public void setBTHandler(Context c, Handler myHandler) {
         mydb = new DBHelper(c);
         try {
             this.btManagerGlobal = new ShimmerBluetoothManagerAndroid(c, myHandler);
-            //btManager.connectShimmerThroughBTAddress(bluetoothAdd);
-            //shimmer = new Shimmer(mHandler);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("ManualDeb: MyGlobals Problem connecting");
@@ -72,47 +76,8 @@ public class MyGlobals implements Serializable {
     }
 
     /*
-    * Not used
+    * Writes on buffer
      */
-    public void setCVS(File file4) {
-        /*try {
-            if (!file4.exists()) {
-                file4.createNewFile();
-            }
-            this.outputStreamGlobal = new FileOutputStream(file4, true);
-            System.out.println("ManualDeb: set file");
-        } catch (Exception e) {
-            this.outputStreamGlobal = null;
-            System.out.println("ManualDeb: set file wrong");
-            e.printStackTrace();
-        }*/
-        String baseDir = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-        String fileName = "9ObjectClusterExample Data " + DateFormat.getDateTimeInstance().format(new Date()) + ".csv";
-        String filePath = baseDir + File.separator + fileName;
-        File file = new File(filePath);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            this.fwglobal = new FileWriter(file.getAbsoluteFile());
-            this.bwglobal = new BufferedWriter(this.fwglobal);
-            System.out.println("ManualDeb: set file");
-        } catch (Exception e) {
-            System.out.println("ManualDeb: set file wrong");
-            e.printStackTrace();
-        }
-        /*if (counterdb>=1000) {
-            mydb.insertContact(totalstring);
-            totalstring = "";
-            counterdb = 0;
-        }
-        else {
-            totalstring += "";
-            counterdb = 0;
-        }*/
-
-    }
-
     public void startBT() {
         try {   //Stop CSV writing
             shimmer = (Shimmer) btManagerGlobal.getShimmer(macAddresGlobal);
@@ -125,6 +90,9 @@ public class MyGlobals implements Serializable {
         }
     }
 
+    /*
+    * Stopps writing and close buffer
+     */
     public void stopBT() {
         try {   //Stop CSV writing
             this.bwglobal.flush();
@@ -152,6 +120,7 @@ public class MyGlobals implements Serializable {
         return outputStreamGlobal;
     }
 
+    //Writes from buffer to file
     public void writeCSV(String channelName) {
         try {
             //outputStreamGlobal.write(channelName.getBytes());

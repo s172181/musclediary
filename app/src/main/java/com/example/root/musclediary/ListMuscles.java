@@ -34,6 +34,11 @@ import android.widget.Toast;
 
 public class ListMuscles extends AppCompatActivity {
 
+    /*
+    * This activity is for the screen to select group of muscles
+    *  and start loading data from shimmer
+     */
+
     private String macAdd = "";
 
     private DrawerLayout mDrawer;
@@ -55,37 +60,17 @@ public class ListMuscles extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TextView helpsensorc = (TextView) findViewById(R.id.connectsensor);
-        String udata="How to connect sensor pads";
-        SpannableString content = new SpannableString(udata);
-        content.setSpan(new UnderlineSpan(), 0, udata.length(), 0);
-        helpsensorc.setText(content);
-        helpsensorc.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(ListMuscles.this, android.R.style.Theme_Material_Dialog_Alert);
-                } else {
-                    builder = new AlertDialog.Builder(ListMuscles.this);
-                }
-                builder.setTitle("Shimmer Sensor")
-                        .setMessage("To connect the sensor ... ")
-                        .setPositiveButton("OK",null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
-
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("List Muscles");
 
         Intent i = getIntent();
         usesensor = getIntent().getExtras().getBoolean("usesensor");
-        /*Commented wed*/
         connectSensor = (Button) findViewById(R.id.startRecord);
         pb = (ProgressBar) findViewById(R.id.progressconnection);
         if (usesensor) {
+            //Loading progress bar dissapears when shimmer is ready to load data
+            // sometimes connection is lost with shimmer, so user has to go back to
+            // main screen and connect again. This has to be improved.
             aux = (MyGlobals) i.getSerializableExtra("primObject");
             pb.setVisibility(View.VISIBLE);
             connectSensor.setEnabled(false);
@@ -96,9 +81,9 @@ public class ListMuscles extends AppCompatActivity {
         }
 
         //Spinner
-        //get the spinner from the xml.
+        //List with group of muscles
         Spinner dropdown = findViewById(R.id.spinner1);
-        String[] items = new String[]{"Upper Leg", "Low Leg", "Biceps","Triceps" };
+        String[] items = new String[]{ "Calf","Hamstrings", "Biceps","Triceps" };
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
         dropdown.setAdapter(adapter);
@@ -115,18 +100,16 @@ public class ListMuscles extends AppCompatActivity {
         macAdd = getIntent().getStringExtra("ITEM_EXTRA");
         filename = getIntent().getStringExtra("FILENAME");
 
-
-        /*Commented wed*/
+        //Button to start loading data
         connectSensor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Here we do the connection and the go to listmuscles
 
                 Intent intent = new Intent(ListMuscles.this, LoadingScreen.class);
-                /*Commented wed*/
                 if (usesensor) {
                     intent.putExtra("primObject", aux);
-                    intent.putExtra("FILENAME", filename);
+                    intent.putExtra("FILENAME", filename); //contains csv file to write shimmer sensor EMG data
                 }
                 intent.putExtra("usesensor", usesensor);
 
@@ -134,27 +117,10 @@ public class ListMuscles extends AppCompatActivity {
             }
         });
 
-        /*FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(ListMuscles.this, android.R.style.Theme_Material_Dialog_Alert);
-                } else {
-                    builder = new AlertDialog.Builder(ListMuscles.this);
-                }
-                builder.setTitle("Shimmer Sensor")
-                        .setMessage("To connect the sensor ... ")
-                        .setPositiveButton("OK",null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });*/
-
-        //Activate when state of shimmer is Login
-        //Set the schedule function
-        /*Commented wed*/
+        //This is to check connection with shimmer sensor
+        // if state of connection is "Ready" then the progress bar dissappears
+        // and start button is blue
+        // Otherwise user has to go back and connect again
         if (usesensor) {
             timer.scheduleAtFixedRate(new TimerTask() {
                                           @Override
@@ -163,8 +129,6 @@ public class ListMuscles extends AppCompatActivity {
                                               runOnUiThread(new Runnable() {
                                                   @Override
                                                   public void run() {
-                                                      // Magic here
-                                                      //connectSensor.setEnabled(true);
                                                       if (aux != null) {
                                                           if (aux.getStateShimmer().equals("SD Logging")) {
                                                               connectSensor.setEnabled(true);

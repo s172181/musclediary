@@ -19,6 +19,10 @@ import java.util.List;
 
 public class MyHistory extends AppCompatActivity {
 
+    /*
+    * Activity that handles the fragments History
+     */
+
     TabLayout tabLayout;
 
     @Override
@@ -28,19 +32,15 @@ public class MyHistory extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("My History");
+        getSupportActionBar().setTitle("Your History");
 
         /*Tab menu*/
         tabLayout = (TabLayout) findViewById(R.id.tabLayout);
         tabLayout.addTab(tabLayout.newTab().setText("All"));
-        tabLayout.addTab(tabLayout.newTab().setText("Upper Leg"));
-        tabLayout.addTab(tabLayout.newTab().setText("Low Leg"));
+        tabLayout.addTab(tabLayout.newTab().setText("Calf"));
+        tabLayout.addTab(tabLayout.newTab().setText("Hamstrings"));
         tabLayout.addTab(tabLayout.newTab().setText("Biceps"));
         tabLayout.addTab(tabLayout.newTab().setText("Triceps"));
-
-        //Select
-
-        //System.out.println("ManualDeb: tabs "+tabLayout.getTabCount());
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         final PagerAdapter adapter = new PagerAdapter
@@ -63,10 +63,8 @@ public class MyHistory extends AppCompatActivity {
 
             }
         });
-        /**/
 
         setSupportActionBar(toolbar);
-        //Your toolbar is now an action bar and you can use it like you always do, for example:
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 

@@ -40,6 +40,10 @@ import com.example.root.musclediary.MyGlobals;
 
 public class LoadingScreen extends AppCompatActivity {
 
+    /*
+    * This activities loads the data and shows a Chronometer
+     */
+
     ShimmerBluetoothManagerAndroid btManager;
     MyGlobals aux2 = new MyGlobals();
     private String filename = "";
@@ -65,7 +69,6 @@ public class LoadingScreen extends AppCompatActivity {
 
         cmTimer = (Chronometer) findViewById(R.id.cmTimer);
 
-        // example setOnChronometerTickListener
         cmTimer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             public void onChronometerTick(Chronometer arg0) {
                 long minutes = ((SystemClock.elapsedRealtime() - cmTimer.getBase()) / 1000) / 60;
@@ -81,7 +84,6 @@ public class LoadingScreen extends AppCompatActivity {
 
         //Start BTshimmer
         Intent i = getIntent();
-        /*Commented wed*/
         if (usesensor) {
             aux2 = (MyGlobals) i.getSerializableExtra("primObject");
             filename = getIntent().getStringExtra("FILENAME");
@@ -96,9 +98,8 @@ public class LoadingScreen extends AppCompatActivity {
                 /////
                 cmTimer.stop();
                 cmTimer.setText("");
-                /*Commented wed*/
                 if (usesensor) {
-                    aux2.stopBT();
+                    aux2.stopBT(); //Stop loading data
                 }
 
                 //Go to resultscreen

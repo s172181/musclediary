@@ -16,6 +16,11 @@ import java.util.HashMap;
  */
 
 public class DBHelper extends SQLiteOpenHelper {
+    /*
+    * This helper is not used, but it is intended to
+    * use for the saving of data to access through History.
+     */
+
     private static DBHelper sInstance;
 
     // Database Info
@@ -86,8 +91,6 @@ public class DBHelper extends SQLiteOpenHelper {
         // Create and/or open the database for writing
         SQLiteDatabase db = getWritableDatabase();
 
-        // It's a good idea to wrap our insert in a transaction. This helps with performance and ensures
-        // consistency of the database.
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
@@ -95,7 +98,6 @@ public class DBHelper extends SQLiteOpenHelper {
             values.put(KEY_TRA_PV, pv);
             values.put(KEY_TRA_AV, av);
 
-            // Notice how we haven't specified the primary key. SQLite auto increments the primary key column.
             db.insertOrThrow(TABLE_TRAINING, null, values);
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -107,16 +109,10 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public void getAllPosts() {
-
-        // SELECT * FROM POSTS
-        // LEFT OUTER JOIN USERS
-        // ON POSTS.KEY_POST_USER_ID_FK = USERS.KEY_USER_ID
         String POSTS_SELECT_QUERY =
                 String.format("SELECT * FROM %s",
                         TABLE_TRAINING);
 
-        // "getReadableDatabase()" and "getWriteableDatabase()" return the same object (except under low
-        // disk space scenarios)
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(POSTS_SELECT_QUERY, null);
         try {

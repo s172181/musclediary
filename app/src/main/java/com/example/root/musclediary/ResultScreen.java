@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -69,6 +70,11 @@ import org.apache.commons.lang3.ArrayUtils;
 
 public class ResultScreen extends AppCompatActivity {
 
+    /*
+    * This activity displays result Screen
+    *  with EMG graph and the values "Mean amplitude", "Maximum amplitude", "Active training"
+     */
+
     //Start of the file, normally the file from shimmercapture starts with data at the 4 row
     int startofcsv = 2;
 
@@ -80,6 +86,8 @@ public class ResultScreen extends AppCompatActivity {
 
     boolean loadinggraph = true;
     private boolean usesensor = true;
+    LineChart chart;
+    TextView zoomtext;
 
     private static DecimalFormat df2 = new DecimalFormat(".##");
 
@@ -89,28 +97,15 @@ public class ResultScreen extends AppCompatActivity {
         setContentView(R.layout.activity_result_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        zoomtext = (TextView) findViewById(R.id.zoomin0);
+
         //Create database
         // Get singleton instance of database
+        // this is to save results. To be implemented.
         /*DBHelper databaseHelper = DBHelper.getInstance(this);
         databaseHelper.insertContent("0.5",0.6,0.7);
         databaseHelper.getAllPosts();*/
-        ImageView zoomin = (ImageView) findViewById(R.id.zoomin0);
-        zoomin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    builder = new AlertDialog.Builder(ResultScreen.this, android.R.style.Theme_Material_Dialog_Alert);
-                } else {
-                    builder = new AlertDialog.Builder(ResultScreen.this);
-                }
-                builder.setTitle("Zoom")
-                        .setMessage("Zoom in and scroll through the graph to detail the electromyograph")
-                        .setPositiveButton("OK",null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
+
         TextView ttitle1 = (TextView) findViewById(R.id.title1);
         ttitle1.setTypeface(null, Typeface.BOLD);
         TextView ttitle2 = (TextView) findViewById(R.id.title2);
@@ -153,11 +148,16 @@ public class ResultScreen extends AppCompatActivity {
                     //Here we read from the file
                     //Change name of the file here
                     CSVReader reader;
+                    /*
+                    * If user selected "skip" on the first screen, sample data will be loaded
+                    * and displayed
+                    * Otherwise data extracted from shimmer sensor will be displayed
+                    *  obtained from the csv file created in MainActivity and loaded in LoadingScreen
+                     */
                     if (!usesensor) {
-                        final InputStream in = getAssets().open("Eder_250418.csv");
-                        //final InputStream in = getAssets().open("EMGDataApr 18, 2018 6_38_50 PM.csv");
+                        final InputStream in = getAssets().open("sample1.csv");
+                        //final InputStream in = getAssets().open("sample2.csv");
                         InputStreamReader csvStreamReader = new InputStreamReader(in);
-                        //CSVReader reader = new CSVReader(csvStreamReader, '\t');
                         reader = new CSVReader(csvStreamReader, ',');
                     }
                     else {
@@ -181,10 +181,8 @@ public class ResultScreen extends AppCompatActivity {
                             emg = Float.parseFloat(nextLine[2]); //Channel 1
                             //Here is the columns were we read from the file
                             //since we are using channel one then we need to select column
-                            //column 6 (EMG_CH1_24BIT_CAL)
-                            //column 5 Timestamp CAL
-                            /*timestamp = Float.parseFloat(nextLine[5]);
-                            emg = Float.parseFloat(nextLine[6]);*/
+                            //column 1 (EMG_CH1_24BIT)
+                            //column 0 Timestamp
 
                             if (it == startofcsv) {
                                 fvalue = timestamp;
@@ -197,6 +195,7 @@ public class ResultScreen extends AppCompatActivity {
                             }
                             previousminutes = newv;
                             //Getting max value
+                            //This value is not used anymore
                             if (emg > peakvalue)
                                 peakvalue = emg;
 
@@ -204,8 +203,6 @@ public class ResultScreen extends AppCompatActivity {
                             currAvg.addData(emg);
                             avg = currAvg.getMean();
                             yvalues.add((float) avg);
-                   /* if (it == 100)
-                        break;*/
                         }
                         it++;
                     }
@@ -213,7 +210,7 @@ public class ResultScreen extends AppCompatActivity {
                     loadinggraph = false;
                     e.printStackTrace();
                     System.out.println("ManualDeb: filename error "+e.getMessage());
-                    Toast.makeText(ResultScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(ResultScreen.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     //Getting emg average
 
                 }
@@ -224,11 +221,13 @@ public class ResultScreen extends AppCompatActivity {
 
                 ArrayList<Double> peaks = new ArrayList<Double>();
 
+                /*
+                *Here we get active training, maximum amplitude and mean amplitude
+                 */
                 for (float i:yvalues) {
                     TrainingAvgObj.addData(i);
                     ChangeRate.addData(i);
                     peaks.add(ChangeRate.getChange());
-                    //System.out.println("ManualDeb: peaks %f"+ChangeRate.getChange());
                     if(ChangeRate.getChange() > 0.3 || ChangeRate.getChange() < -0.3) {
                         Active++;
                     }
@@ -240,27 +239,17 @@ public class ResultScreen extends AppCompatActivity {
                 Sum = Active + Inactive;
                 rate= (double)Active*100000/(double)Sum;
 
-
-
-                //Graph here
+                //Create Graph here
                 //y the times
                 //x the averages
-                DataPoint[] dataPoints = new DataPoint[xvalues.size()]; // declare an array of DataPoint objects with the same size as your list
+                DataPoint[] dataPoints = new DataPoint[xvalues.size()];
                 List<Entry> entries = new ArrayList<Entry>();
                 for (int i = 0; i < xvalues.size(); i++) {
-                    //System.out.println("ManualDeb: x y"+xvaluesS.get(i)+" "+yvalues.get(i));
-                    // add new DataPoint object to the array for each of your list entries
-                    dataPoints[i] = new DataPoint(xvalues.get(i), yvalues.get(i)); // not sure but I think the second argument should be of type double
+                    dataPoints[i] = new DataPoint(xvalues.get(i), yvalues.get(i));
                     entries.add(new Entry(xvalues.get(i), yvalues.get(i)));
                 }
 
-                /*LineChart chart = (LineChart) findViewById(R.id.graph);
-                LineDataSet dataSet = new LineDataSet(entries, "Label");
-                LineData lineData = new LineData(dataSet);
-                chart.setData(lineData);
-                chart.invalidate();*/ // refresh
-
-                LineChart chart = (LineChart) findViewById(R.id.graph);
+                chart = (LineChart) findViewById(R.id.graph);
                 LineDataSet dataSet = new LineDataSet(entries, null);
                 chart.getLegend().setEnabled(false);
                 dataSet.setLineWidth(1f);
@@ -292,51 +281,9 @@ public class ResultScreen extends AppCompatActivity {
                 chart.getDescription().setEnabled(false);
                 chart.invalidate();
 
-                //GraphView graphview = (GraphView) findViewById(R.id.graph);
-                //LineGraphSeries<DataPoint> series = new LineGraphSeries<DataPoint>(dataPoints);
-                //graphview.addSeries(series);
-
-                // activate horizontal zooming and scrolling
-                //graphview.getViewport().setScalable(true);
-
-                // activate horizontal scrolling
-                /*NumberFormat nf = NumberFormat.getInstance();
-
-                // custom label formatter to show currency "EUR"
-                graphview.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
-                    @Override
-                    public String formatLabel(double value, boolean isValueX) {
-                        if (isValueX) {
-                            // show x values in minutes
-                            String val3 = String.format(".%d", TimeUnit.MILLISECONDS.toSeconds((long) value) -
-                                            TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes((long) value))
-                            );
-                            return super.formatLabel(TimeUnit.MILLISECONDS.toMinutes((long) value), isValueX)+val3;
-                        } else {
-                            // show currency for y values
-                            return super.formatLabel(value, isValueX);
-                        }
-                    }
-                });
-
-                graphview.getViewport().setScrollable(true);*/
-
-                // set manual X bounds
-                //graphview.getViewport().setXAxisBoundsManual(true);
-                //graphview.getViewport().setMinX(0);
-
-               /* int totalminutes2 = 3;
-                if (totalminutes>10)
-                    totalminutes2 = Math.round(totalminutes/2);
-                else if (totalminutes>1)
-                    totalminutes2 = Math.round(totalminutes);
-                else if (totalminutes<=1)
-                    totalminutes2 = Math.round(1);
-
-                System.out.println("ManualDeb: Total minutes: "+totalminutes+" "+totalminutes2);
-                graphview.getViewport().setMaxX(totalminutes2+0.5);*/
-
-                //Progress bar
+                /*
+                * Efficiency results:
+                 */
                 TextView barnum = (TextView) findViewById(R.id.peek);
                 barnum.setText("Maximum amplitude: " + String.format("%.2f", Collections.max(peaks)));
 
@@ -346,30 +293,66 @@ public class ResultScreen extends AppCompatActivity {
 
                 TextView barnum2 = (TextView) findViewById(R.id.active);
                 barnum2.setText("Active training: " + Math.round(rate)+" %");
-                /*ProgressBar bar2 = (ProgressBar) findViewById(R.id.activenegbar);
-                bar2.setIndeterminateDrawable(context.getResources().getDrawable(R.drawable.activenegbar));*/
+
                 loadinggraph = false;
-                //BootstrapProgressBar bar = (BootstrapProgressBar) findViewById(R.id.peekvalue);
-                //bar.setProgress(peakvalue);
+
             }
         }, 1000);   //2 seconds
 
-        ImageView infoactive = findViewById(R.id.infoev);
+        ImageView infoactive = findViewById(R.id.infoev2);
         infoactive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder;
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     builder = new AlertDialog.Builder(ResultScreen.this, android.R.style.Theme_Material_Dialog_Alert);
                 } else {
                     builder = new AlertDialog.Builder(ResultScreen.this);
                 }
-                builder.setTitle("Results meaning")
-                        .setMessage("Active training: It shows fraction of the training time that muscle was kept active \n\n"
-                                +"Maximum amplitude: Shows peak amplitude of EMG within training that represents the most significant repetition\n\n"
-                                +"Mean amplitude: Represents average of all amplitudes within a training, that corresponds to the real efficiency of the training\n\n")
+                builder.setIcon(R.drawable.iconchart);
+                builder.setTitle("Active training")
+                        .setMessage("It shows fraction of the training time that muscle was kept active \n\n")
                         .setPositiveButton("OK",null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setIcon(R.drawable.iconchart)
+                        .show();
+            }
+        });
+        ImageView infoactive2 = findViewById(R.id.infoev3);
+        infoactive2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ResultScreen.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(ResultScreen.this);
+                }
+                builder.setIcon(R.drawable.iconchart);
+                builder.setTitle("Maximum amplitude")
+                        .setMessage("Shows peak amplitude of EMG within training that represents the most significant repetition\n\n")
+                        .setPositiveButton("OK",null)
+                        .setIcon(R.drawable.iconchart)
+                        .show();
+            }
+        });
+        ImageView infoactive3 = findViewById(R.id.infoev4);
+        infoactive3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder = new AlertDialog.Builder(ResultScreen.this, android.R.style.Theme_Material_Dialog_Alert);
+                } else {
+                    builder = new AlertDialog.Builder(ResultScreen.this);
+                }
+                builder.setIcon(R.drawable.iconchart);
+                builder.setTitle("Mean amplitude")
+                        .setMessage("Represents average of all amplitudes within a training, that corresponds to the real efficiency of the training\n\n")
+                        .setPositiveButton("OK",null)
+                        .setIcon(R.drawable.iconchart)
                         .show();
             }
         });
@@ -409,6 +392,8 @@ public class ResultScreen extends AppCompatActivity {
             progressBarHolder.setAlpha(1);
             progressBarHolder.setBackgroundColor(0xFFFFFFFF);
             progressBarStyleLarge.setVisibility(View.GONE);
+            chart.setVisibility(View.VISIBLE);
+            zoomtext.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -454,9 +439,10 @@ public class ResultScreen extends AppCompatActivity {
     }
 
 
-    // Java program to calculate
-// Simple Moving Average
-
+    /*
+    * Class to make calculations about active training,
+    * maximum amplitude and mean amplitude
+     */
     public class SimpleMovingAverage {
 
         // queue used to store list so that we get the average
@@ -531,7 +517,7 @@ public class ResultScreen extends AppCompatActivity {
         @Override
         public String getFormattedValue(float value, Entry entry, int dataSetIndex, ViewPortHandler viewPortHandler) {
             // write your logic here
-            return mFormat.format(value) + " $"; // e.g. append a dollar-sign
+            return mFormat.format(value); // e.g. append a dollar-sign
         }
     }
 }
